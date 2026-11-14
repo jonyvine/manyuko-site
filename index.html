@@ -89,6 +89,22 @@ footer{border-top:3px solid var(--ink);padding:22px 0 40px;font-size:12px;color:
   .specs div:last-child{border-bottom:0}
 }
 @media (max-width:460px){ .how{grid-template-columns:1fr} nav{gap:12px} }
+.only-phone{display:none}
+.phone-note{border:2px solid var(--ink);border-radius:20px;background:#fff;padding:22px;margin:0 0 22px}
+.phone-note p{margin:0 0 12px;font-size:16.5px;line-height:1.55}
+.phone-note .pn-title{font-weight:800;font-size:24px;line-height:1.15;margin-bottom:10px}
+.pn-shot{margin:16px 0 0}
+.pn-shot img{border:2px solid var(--ink);border-radius:12px}
+.pn-shot figcaption{font-family:var(--mono);font-size:12px;letter-spacing:.06em;margin-top:8px;opacity:.7}
+@media (max-width:700px){
+  .only-phone{display:inline}
+  div.only-phone{display:block}
+  .only-desk{display:none}
+  header.top{flex-direction:column;align-items:flex-start;gap:12px;padding:20px 0}
+  nav{gap:16px;font-size:11px}
+  .hero{padding:44px 0}
+  section{padding:64px 0}
+}
 @media (prefers-reduced-motion:reduce){ .btn:hover{transform:none} }
 
 /* PREVIEW: calmer, easier to read */
@@ -138,7 +154,7 @@ footer{font-family:var(--mono);color:var(--ink);opacity:.7;border-top-width:2px}
         <p class="tag"><span>Play your sidechain</span></p>
         <p class="lede">A sidechain you play. Tap the spoon, a key or a MIDI note and your sound dips. Short tap, short dip. Hold it, it stays down. No routing, no ratio, no threshold.</p>
         <div class="ctas">
-          <a class="btn main" href="#demo">Try it in your browser</a>
+          <a class="btn main" href="#demo"><span class="only-desk">Try it in your browser</span><span class="only-phone">Try a taste</span></a>
           <a class="btn" href="#contact">Get in touch</a>
         </div>
       </div>
@@ -147,9 +163,16 @@ footer{font-family:var(--mono);color:var(--ink);opacity:.7;border-top-width:2px}
 
     <section id="demo" aria-labelledby="demo-h">
       <h2 id="demo-h">Try it right here</h2>
-      <p class="sub">This is the real plugin screen running the same sound engine as the plugin. Press play, then tap the spoon or press T. A MIDI keyboard works too, in Chrome.</p>
-      <div class="demo-frame"><iframe id="demoFrame" src="demo/index.html" title="THE SPOON browser demo" allow="autoplay; midi" loading="lazy"></iframe></div>
-      <p class="demo-note">Headphones help. The demo pad is an original track; you can also load your own loop.</p>
+      <p class="sub only-desk">This is the real plugin screen running the same sound engine as the plugin. Press play, then tap the spoon or press T. A MIDI keyboard works too, in Chrome.</p>
+      <div class="phone-note only-phone">
+        <p class="kicker">You're on a phone</p>
+        <p class="pn-title">This is just a taste.</p>
+        <p>THE SPOON is a plugin for your music software on a Mac (VST3 and AU). Below you can tap the jelly and hear the sound dip.</p>
+        <p><strong>The full demo, with every control, runs right in your browser on a computer.</strong> Open manyuko.com on your Mac or PC to try the real thing.</p>
+        <figure class="pn-shot"><img src="img/spoon-controls.jpg" width="2152" height="1618" alt="The full plugin screen with all its controls" loading="lazy"><figcaption>The full plugin, on a computer</figcaption></figure>
+      </div>
+      <div class="demo-frame"><iframe id="demoFrame" src="about:blank" title="THE SPOON browser demo" allow="autoplay; midi" loading="lazy"></iframe></div>
+      <p class="demo-note"><span class="only-desk">Headphones help. The demo pad is an original track; you can also load your own loop.</span><span class="only-phone">Headphones help. Silent mode on? Turn it off to hear it.</span></p>
     </section>
 
     <section aria-labelledby="how-h">
@@ -207,7 +230,13 @@ footer{font-family:var(--mono);color:var(--ink);opacity:.7;border-top-width:2px}
 // keep the demo frame as tall as the plugin needs at this width
 (function(){
   const f=document.getElementById("demoFrame");
-  function size(){ const w=f.clientWidth; const s=Math.max(0.3,Math.min(1.25,(w-24)/980)); f.style.height=Math.round(736*s+150)+"px"; }
+  const phone=window.matchMedia("(max-width: 700px)").matches;
+  f.src = phone ? "demo/index.html?mobile=1" : "demo/index.html";
+  function size(){
+    const w=f.clientWidth;
+    if(phone){ const s=Math.max(0.3,(w-8)/640); f.style.height=Math.round(580*s+96)+"px"; }
+    else { const s=Math.max(0.3,Math.min(1.25,(w-24)/980)); f.style.height=Math.round(736*s+150)+"px"; }
+  }
   size(); window.addEventListener("resize",size);
 })();
 </script>

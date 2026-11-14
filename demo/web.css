@@ -16,3 +16,12 @@ body{background:#e8e4dc!important;overflow:auto!important;display:flex!important
 #wb-status{width:100%;text-align:center;font-weight:400;text-transform:none;letter-spacing:.02em;color:#555;font-size:12px;min-height:0}
 #wb-status:empty{display:none}
 .wb-foot{margin-top:12px;font-family:"Space Mono",monospace;font-size:11px;color:#6d6a63;text-align:center}
+
+/* phone taste */
+.wb-mobile body{display:block!important;padding:0 0 6px!important;overflow:hidden!important;touch-action:manipulation}
+.wb-mobile #wb-bar{border-radius:16px;margin:6px 6px 8px;padding:8px 10px;gap:8px;width:calc(100% - 12px);position:relative;z-index:5}
+.wb-mobile #wb-bar .wb-brand,.wb-mobile #wb-bar label,.wb-mobile #wb-bar .seg,.wb-mobile #wb-kick{display:none}
+.wb-mobile #wb-play{min-width:140px;font-size:14px;padding:9px 16px}
+.wb-mobile #wb-status{font-size:12.5px;line-height:1.4}
+.wb-mobile .wb-foot,.wb-mobile #ctlBtn,.wb-mobile .ver{display:none!important}
+.wb-mobile .wrap{position:relative;z-index:1}

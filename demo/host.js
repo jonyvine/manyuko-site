@@ -3,6 +3,9 @@
 (function () {
 "use strict";
 const LS = "thespoon-web-v1";
+// ?mobile=1 : a phone-sized taste (Jelly mode only, tap anywhere). The full plugin screen is for computers.
+const MOBILE = new URLSearchParams(location.search).has("mobile");
+if (MOBILE) document.documentElement.classList.add("wb-mobile");
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem(LS) || "{}") || {}; } catch (e) { saved = {}; }
 const P = Object.assign({ howLong: 250, longUnit: 0, howDeep: 0.85, howSoft: 7, grid: 3, autoScoop: 0, autoRate: 1, speedBlender: 0, mode: 0, spoon: 0 }, saved.params || {});
@@ -25,7 +28,7 @@ const NATIVE = {
   setParam(id, v) { if (id in P) { P[id] = Number(v); post({ type: "param", id, v: Number(v) }); persist(); } },
   gesture() {},
   tap(on) { ensureAudio(); if (on && !T.playing && !T.everPlayed) play(); post({ type: "tap", on: !!on }); },
-  uiState(k, v) { UI[k] = v; persist(); },
+  uiState(k, v) { if (MOBILE && k === "drawerOpen") return; UI[k] = v; persist(); },
   learnMidi(on) { learning = !!on; if (on) ensureMidi(); },
   resize() {},
   setTaps(mode, flat) { const key = mode ? "song" : "pattern"; TAPS[key] = (flat || []).slice(); post({ type: "setTaps", mode: mode ? 1 : 0, taps: unflat(TAPS[key]) }); persist(); },
@@ -38,7 +41,7 @@ const NATIVE = {
   },
 };
 window.__JUCE__ = {
-  initialisationData: { version: "0.4.1 · web", drawerOpen: UI.drawerOpen, scale: 1 },
+  initialisationData: { version: "0.4.1 · web", drawerOpen: MOBILE ? "0" : UI.drawerOpen, scale: 1 },
   backend: {
     addEventListener(name, f) { (handlers[name] = handlers[name] || []).push(f); return [name, f]; },
     removeEventListener() {},
@@ -162,6 +165,14 @@ function onMidi(e) {
 /* ---------- fit the plugin into the window ---------- */
 function fit() {
   const bar = document.getElementById("wb-bar");
+  if (MOBILE) {
+    // show just the jelly scene (spoon, bowl, dancer), as big as the phone allows
+    const s = Math.max(0.3, (window.innerWidth - 8) / 640);
+    emit("scale", { s });
+    const wrap = document.querySelector(".wrap");
+    if (wrap) { wrap.style.marginLeft = (-262 * s) + "px"; wrap.style.marginTop = (-128 * s) + "px"; wrap.style.marginRight = "0"; wrap.style.marginBottom = (580 * s - 736 * s - 0) + "px"; }
+    return;
+  }
   const availW = window.innerWidth - 24, availH = window.innerHeight - (bar ? bar.offsetHeight : 0) - 28;
   const s = Math.max(0.3, Math.min(1.25, availW / 980, Math.max(availH, 420) / 736));
   emit("scale", { s });
@@ -180,7 +191,8 @@ function syncBar() {
   document.getElementById("wb-kick").setAttribute("aria-pressed", T.kick);
   document.getElementById("wb-pad").classList.toggle("on", T.source === "pad");
   document.getElementById("wb-own").classList.toggle("on", T.source === "file");
-  setStatus(T.playing ? "" : (T.everPlayed ? "" : "Press play (or just tap the spoon) and play your sidechain."));
+  if (MOBILE) setStatus(T.playing ? "Tap anywhere on the jelly." : "Press play, then tap the jelly. Silent mode on? Turn it off to hear it.");
+  else setStatus(T.playing ? "" : (T.everPlayed ? "" : "Press play (or just tap the spoon) and play your sidechain."));
 }
 document.addEventListener("DOMContentLoaded", () => {
   const $ = id => document.getElementById(id);
@@ -211,6 +223,15 @@ document.addEventListener("DOMContentLoaded", () => {
   requestAnimationFrame(fit);
 });
 document.addEventListener("pointerdown", () => { if (!ctx) ensureAudio(); }, { capture: true, once: true });
+if (MOBILE) {
+  // on a phone the whole scene is the spoon: touch anywhere (except the player bar) to dip
+  let held = false;
+  const inBar = e => e.target && e.target.closest && e.target.closest("#wb-bar");
+  document.addEventListener("pointerdown", e => { if (inBar(e) || held) return; held = true; NATIVE.tap(true); }, true);
+  const up = () => { if (!held) return; held = false; NATIVE.tap(false); };
+  document.addEventListener("pointerup", up, true);
+  document.addEventListener("pointercancel", up, true);
+}
 
 /* ---------- the demo track: original atmospheric pad in A minor (same as the prototype) ---------- */
 function makePad(ac, dest) {
