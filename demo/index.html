@@ -812,7 +812,7 @@ document.addEventListener("pointerdown",e=>{ if(!pop.hidden && !pop.contains(e.t
 window.addEventListener("resize",closePop);
 // One grid for everything: where taps land when you play, and where they snap when you draw or drag.
 // Changing it never moves taps you already recorded.
-$("gridBtn").onclick=()=>openPop($("gridBtn"),GRIDS,S.gridName,(n,v)=>{ S.grid=v; S.gridName=n; S.editGrid=v; S.editName=n; $("gridVal").textContent=n; commit(); },
+$("gridBtn").onclick=()=>openPop($("gridBtn"),GRIDS,S.gridName,(n,v)=>{ S.grid=v; S.gridName=n; S.editGrid=v; S.editName=n; $("gridVal").textContent=n; sendParam("grid", GRID_IDX(n)); commit(); },
   null, true);
 const EDITS=[["Free",0],["1/2",2],["1/4",1],["1/8",0.5],["1/16",0.25],["1/32",0.125],["1/64",0.0625],...TRIP,...DOT];
 function makeTight(){
