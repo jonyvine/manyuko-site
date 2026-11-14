@@ -71,7 +71,7 @@ class SpoonProcessor extends AudioWorkletProcessor {
     this.screenHeld = false; this.midiDown = 0; this.recording = false;
     this.tr = { playing: false, at: 0, ap: 0, bpm: 120 };
     this.wasPlaying = false; this.wasAutoOn = false; this.expected = 0; this.nextAuto = 0; this.lastAuto = -1e9;
-    this.prevLive = false; this.recIndex = -1; this.recMode = 0; this.recStartAbs = 0;
+    this.prevLive = false; this.prevTap = false; this.liveLocked = false; this.liveStart = 0; this.liveEnd = 0; this.recIndex = -1; this.recMode = 0; this.recStartAbs = 0;
     this.recVersion = 0; this.sentVersion = 0; this.level = 0; this.blocks = 0;
     this.port.onmessage = e => this.onMsg(e.data);
   }
@@ -134,7 +134,14 @@ class SpoonProcessor extends AudioWorkletProcessor {
     for (let i = 0; i < n; i++) {
       const beatNow = ppq + i * bps;
       if (autoOn && beatNow >= this.nextAuto - 1e-9) { this.env.hit(autoAttack, autoHold); this.lastAuto = this.nextAuto; this.nextAuto += effRate; }
-      const live = this.screenHeld || p.spoon >= 0.5 || this.midiDown > 0;
+      const tapNow = this.screenHeld || this.midiDown > 0;
+      const live = tapNow || p.spoon >= 0.5;
+      // live taps follow the Grid while playing (Free or stopped = right away)
+      if (tapNow && !this.prevTap) { this.liveLocked = playing && grid > 0; if (this.liveLocked) { this.liveStart = lockStart(beatNow, grid, bpm); this.liveEnd = 1e18; } }
+      if (!tapNow && this.prevTap && this.liveLocked) this.liveEnd = this.liveStart + lockLength(Math.max(0, beatNow - this.liveStart), grid);
+      if (this.liveLocked && (!playing || beatNow >= this.liveEnd)) this.liveLocked = false;
+      this.prevTap = tapNow;
+      const liveTapHeld = this.liveLocked ? (beatNow >= this.liveStart && beatNow < this.liveEnd) : tapNow;
 
       if (live && !this.prevLive && canRecord && taps.length < MAX_TAPS) {
         this.recStartAbs = lockStart(beatNow, grid, bpm);
@@ -154,7 +161,7 @@ class SpoonProcessor extends AudioWorkletProcessor {
 
       let tapHeld = false;
       for (const c of cands) if (beatNow >= c.start && beatNow < c.start + c.len) { tapHeld = true; break; }
-      const g = this.env.next(live || tapHeld);
+      const g = this.env.next(liveTapHeld || p.spoon >= 0.5 || tapHeld);
       for (let ch = 0; ch < output.length; ch++) {
         const src = input[ch] || input[0];
         output[ch][i] = src ? src[i] * g : 0;
