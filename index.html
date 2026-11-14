@@ -90,6 +90,37 @@ footer{border-top:3px solid var(--ink);padding:22px 0 40px;font-size:12px;color:
 }
 @media (max-width:460px){ .how{grid-template-columns:1fr} nav{gap:12px} }
 @media (prefers-reduced-motion:reduce){ .btn:hover{transform:none} }
+
+/* PREVIEW: calmer, easier to read */
+body{font-family:var(--display);font-weight:400;font-size:18px;line-height:1.7;color:var(--ink)}
+.page{max-width:1080px;padding:0 28px}
+header.top{padding:30px 0;border-bottom-width:2px}
+nav{font-family:var(--mono);gap:26px}
+.hero{gap:64px;padding:96px 0 88px}
+.kicker{font-family:var(--mono);color:var(--ink);opacity:.6}
+h1{font-size:clamp(60px,8vw,104px)}
+.tag{margin:20px 0 28px}
+.lede{font-size:20px;line-height:1.6;max-width:30ch;margin:0 0 34px;font-weight:400}
+.btn{font-family:var(--mono)}
+section{padding:96px 0;border-top-width:2px}
+h2{font-size:clamp(34px,4.4vw,52px);margin:0 0 18px}
+.sub{color:var(--ink);font-size:19px;max-width:52ch;margin:0 0 40px}
+.how{gap:26px}
+.how li{padding:26px;border-width:2px;border-radius:20px}
+.how b{font-size:21px;margin-bottom:10px}
+.how p{font-size:16px;line-height:1.6}
+.split,.about{gap:72px}
+.quote{font-size:clamp(28px,3.6vw,40px);margin-bottom:22px}
+.specs{border-width:2px}
+.specs div{padding:24px;border-right-width:2px}
+.specs dt{font-family:var(--mono);color:var(--ink);opacity:.6}
+.about p{font-size:18px;margin:0 0 18px}
+.contact{padding:30px;border-width:2px;border-radius:20px}
+.demo-note{color:var(--ink);opacity:.7;font-size:14px}
+footer{font-family:var(--mono);color:var(--ink);opacity:.7;border-top-width:2px}
+.hero{grid-template-columns:minmax(0,5.4fr) minmax(0,6.6fr)}
+.btn{padding:11px 17px;letter-spacing:.07em}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding:56px 0}}
 </style>
 </head>
 <body>
