@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MANYUKO · THE SPOON</title>
+<meta name="description" content="THE SPOON by MANYUKO: a sidechain you play. Tap the spoon, a key or a MIDI note and your sound dips. VST3 and AU for Mac.">
+<style>
+:root{
+  /* one visual world: the plugin's own kitchen. Paper, ink, jelly pink. */
+  --paper:#f4f2ec;
+  --paper-2:#e9e5dc;
+  --ink:#111111;
+  --soft:#6b675f;
+  --jelly:#ff4f9a;
+  --jelly-deep:#d9206f;
+  --display:"Rubik","Arial Black",system-ui,sans-serif;
+  --mono:"Space Mono",ui-monospace,Menlo,monospace;
+  /* layout: a narrow column of text beside big product pictures, framed like the plugin window */
+  color-scheme:light;
+}
+@font-face{font-family:"Rubik";src:url("fonts/Rubik-Variable.ttf") format("truetype");font-weight:300 900;font-display:swap}
+@font-face{font-family:"Space Mono";src:url("fonts/SpaceMono-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Space Mono";src:url("fonts/SpaceMono-Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:15px;line-height:1.65}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:3px solid var(--jelly);outline-offset:3px;border-radius:6px}
+img{max-width:100%;height:auto;display:block}
+.page{max-width:1120px;margin:0 auto;padding:0 20px}
+
+header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 0;border-bottom:3px solid var(--ink)}
+.mark{font-family:var(--display);font-weight:900;font-size:26px;letter-spacing:.08em;text-decoration:none}
+.mark span{color:var(--jelly)}
+nav{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+nav a{text-decoration:none}
+nav a:hover{color:var(--jelly-deep)}
+
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px;align-items:center;padding:56px 0 40px}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0 0 10px}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(54px,8vw,96px);line-height:.9;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h1 small{display:block;font-size:.3em;color:var(--jelly);letter-spacing:.02em;margin-bottom:.15em}
+.tag{font-size:14px;letter-spacing:.28em;text-transform:uppercase;margin:14px 0 22px;color:var(--soft)}
+.lede{font-size:17px;max-width:34ch;margin:0 0 26px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border:3px solid var(--ink);border-radius:999px;padding:11px 20px;background:transparent;color:var(--ink)}
+.btn.main{background:var(--jelly)}
+.btn:hover{transform:translateY(-1px)}
+.shot{border-radius:22px;overflow:hidden;border:4px solid var(--ink);box-shadow:8px 10px 0 var(--ink);background:var(--paper)}
+
+section{padding:48px 0;border-top:3px solid var(--ink)}
+h2{font-family:var(--display);font-weight:900;font-size:clamp(30px,4vw,44px);line-height:1;margin:0 0 14px;text-wrap:balance}
+.sub{color:var(--soft);max-width:60ch;margin:0 0 26px}
+
+.demo-frame{border:4px solid var(--ink);border-radius:22px;overflow:hidden;background:var(--paper-2)}
+.demo-frame iframe{display:block;width:100%;height:860px;border:0}
+.demo-note{font-size:12px;color:var(--soft);margin:12px 0 0}
+
+.how{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin:0;padding:0;list-style:none}
+.how li{border:3px solid var(--ink);border-radius:16px;padding:18px;background:#fff}
+.how b{display:block;font-family:var(--display);font-weight:800;font-size:19px;line-height:1.15;margin-bottom:8px}
+.how p{margin:0;font-size:13.5px}
+
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center}
+.quote{font-family:var(--display);font-weight:800;font-size:clamp(26px,3.4vw,38px);line-height:1.1;margin:0 0 16px;text-wrap:balance}
+.quote em{font-style:normal;background:var(--jelly);padding:0 .15em;border-radius:6px}
+
+.specs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:3px solid var(--ink);border-radius:16px;overflow:hidden;margin:0}
+.specs div{padding:18px;border-right:3px solid var(--ink)}
+.specs div:last-child{border-right:0}
+.specs dt{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0 0 6px}
+.specs dd{margin:0;font-weight:700}
+.pill{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:2px solid var(--ink);border-radius:999px;padding:1px 8px;margin-left:6px;background:var(--paper-2)}
+
+.about{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:40px}
+.about p{max-width:60ch;margin:0 0 14px}
+.contact{border:3px solid var(--ink);border-radius:16px;padding:22px;background:#fff;align-self:start}
+.contact a.mail{font-family:var(--display);font-weight:800;font-size:22px;text-decoration:none;border-bottom:4px solid var(--jelly)}
+
+footer{border-top:3px solid var(--ink);padding:22px 0 40px;font-size:12px;color:var(--soft);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .hero,.split,.about{grid-template-columns:1fr}
+  .how{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .specs{grid-template-columns:1fr}
+  .specs div{border-right:0;border-bottom:3px solid var(--ink)}
+  .specs div:last-child{border-bottom:0}
+}
+@media (max-width:460px){ .how{grid-template-columns:1fr} nav{gap:12px} }
+@media (prefers-reduced-motion:reduce){ .btn:hover{transform:none} }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <a class="mark" href="#">MANYUKO<span>.</span></a>
+    <nav aria-label="Sections"><a href="#spoon">The Spoon</a><a href="#demo">Try it</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
+  </header>
+
+  <main>
+    <div class="hero" id="spoon">
+      <div>
+        <p class="kicker">Audio plugin · in beta</p>
+        <h1><small>THE</small>SPOON</h1>
+        <p class="tag">Play your sidechain</p>
+        <p class="lede">A sidechain you play. Tap the spoon, a key or a MIDI note and your sound dips. Short tap, short dip. Hold it, it stays down. No routing, no ratio, no threshold.</p>
+        <div class="ctas">
+          <a class="btn main" href="#demo">Try it in your browser</a>
+          <a class="btn" href="#contact">Get in touch</a>
+        </div>
+      </div>
+      <figure class="shot" style="margin:0"><img src="img/spoon-controls.jpg" width="2152" height="1618" alt="THE SPOON plugin window: a spoon dipping into a pink jelly bowl, with How long, How deep and How soft knobs and a lane of recorded taps"></figure>
+    </div>
+
+    <section id="demo" aria-labelledby="demo-h">
+      <h2 id="demo-h">Try it right here</h2>
+      <p class="sub">This is the real plugin screen running the same sound engine as the plugin. Press play, then tap the spoon or press T. A MIDI keyboard works too, in Chrome.</p>
+      <div class="demo-frame"><iframe id="demoFrame" src="demo/index.html" title="THE SPOON browser demo" allow="autoplay; midi" loading="lazy"></iframe></div>
+      <p class="demo-note">Headphones help. The demo pad is an original track; you can also load your own loop.</p>
+    </section>
+
+    <section aria-labelledby="how-h">
+      <h2 id="how-h">Simple surface, serious engine</h2>
+      <p class="sub">The plugin talks like a musician, not like an engineer. Three questions shape every dip.</p>
+      <ul class="how">
+        <li><b>How long? How deep? How soft?</b><p>How fast the sound comes back (in ms or in note values), how far it drops, and how gently it dips in.</p></li>
+        <li><b>Pattern and Song</b><p>Record a 4-bar pattern that loops, or tap along a whole song. Taps lock to your DAW's grid and stay editable.</p></li>
+        <li><b>Auto-scoop and Speed blender</b><p>A steady pump on the beat, with a spring-loaded knob that speeds it up into a riser and snaps back.</p></li>
+        <li><b>Jelly mode</b><p>Close the lid and it's just the spoon, the jelly and a small dancer who changes moves with every dip.</p></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="mix-h">
+      <div class="split">
+        <div>
+          <h2 id="mix-h">For mixers too</h2>
+          <p class="quote">Make room exactly where you need it. Just play your sidechain and <em>spoon it</em>.</p>
+          <p class="sub" style="margin:0">Duck the guitars only in the loudest chorus, clear a gap for one snare hit, breathe a pad around the vocal. No setting up a compressor and a key input for a moment that lasts a bar.</p>
+        </div>
+        <figure class="shot" style="margin:0"><img src="img/spoon-jelly.jpg" width="2152" height="1618" alt="Jelly mode: the spoon dips into the jelly while a cartoon dancer in a headband strikes a pose" loading="lazy"></figure>
+      </div>
+    </section>
+
+    <section aria-labelledby="specs-h">
+      <h2 id="specs-h">Formats</h2>
+      <dl class="specs">
+        <div><dt>Mac</dt><dd>VST3 · Audio Unit</dd></div>
+        <div><dt>Pro Tools</dt><dd>AAX <span class="pill">in progress</span></dd></div>
+        <div><dt>Runs on</dt><dd>Apple Silicon and Intel</dd></div>
+      </dl>
+    </section>
+
+    <section id="about" aria-labelledby="about-h">
+      <div class="about">
+        <div>
+          <h2 id="about-h">About MANYUKO</h2>
+          <p>MANYUKO is a small plugin studio started by Yonatan Weinreich, a producer, songwriter and mixer in Tel Aviv.</p>
+          <p>THE SPOON came out of the studio: sidechain is one of the most useful moves in a mix and one of the most fiddly to set up. So we made one you simply play.</p>
+          <p>More kitchen tools are cooking.</p>
+        </div>
+        <div class="contact" id="contact">
+          <p class="kicker" style="margin-bottom:12px">Contact</p>
+          <p style="margin:0 0 12px">Questions, beta access, press or partnerships:</p>
+          <a class="mail" href="mailto:hello@manyuko.com">hello@manyuko.com</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>© 2026 MANYUKO · Tel Aviv</span><span>THE SPOON · Play your sidechain</span></footer>
+</div>
+<script>
+// keep the demo frame as tall as the plugin needs at this width
+(function(){
+  const f=document.getElementById("demoFrame");
+  function size(){ const w=f.clientWidth; const s=Math.max(0.3,Math.min(1.25,(w-24)/980)); f.style.height=Math.round(736*s+150)+"px"; }
+  size(); window.addEventListener("resize",size);
+})();
+</script>
+</body>
+</html>

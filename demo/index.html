@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE SPOON</title>
+<style>
+@font-face{font-family:"Rubik";src:url("fonts/Rubik-Variable.ttf") format("truetype");font-weight:300 900}
+@font-face{font-family:"Rubik Mono One";src:url("fonts/RubikMonoOne-Regular.ttf") format("truetype");font-weight:400}
+@font-face{font-family:"Space Mono";src:url("fonts/SpaceMono-Regular.ttf") format("truetype");font-weight:400}
+@font-face{font-family:"Space Mono";src:url("fonts/SpaceMono-Bold.ttf") format("truetype");font-weight:700}
+</style>
+<style>
+:root{
+  /* Clean print: off-white plate, black ink, hot pink as the only colour. Spoon left, settings drawer slides out beside it. Single theme by choice. */
+  --desk:#1f2024;
+  --paper:#f4f2ee;
+  --paper-2:#e9e6e0;
+  --ink:#111111;
+  --soft:#7a766f;
+  --pink:#ff4f9a;
+  --pink-soft:#ffd3e5;
+  --jelly:#ff4f9a;
+  --rec:#e0313f;
+  --logo:"Rubik Mono One", "Arial Black", sans-serif;
+  --mono:"Space Mono", ui-monospace, Menlo, monospace;
+  --heb:"Heebo", "Arial Hebrew", Arial, sans-serif;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--paper);font-family:var(--mono);display:block;padding:0;overflow:hidden;user-select:none;-webkit-user-select:none}
+.wrap{display:inline-block;transform-origin:0 0}
+.daw,.notes,.hint{display:none!important}
+.modesw{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;margin-left:10px}
+.modesw button{font-family:var(--mono);font-weight:700;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;border:0;background:transparent;color:var(--ink);padding:4px 11px}
+.modesw button.on{background:var(--ink);color:#fff}
+.lanetools{display:flex;align-items:center}
+.ver{position:absolute;right:22px;bottom:5px;font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--soft);opacity:.55}
+.plugin{position:relative}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,.knob:focus-visible,canvas:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+
+/* fake DAW bar */
+.daw{width:100%;max-width:560px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#18191d;border:1px solid #34353b;border-radius:12px;padding:10px 12px}
+.daw .lbl{font-size:11px;color:#8d8a84;margin-right:4px}
+.pill{font-family:var(--mono);font-size:12px;border:1px solid #45464d;background:transparent;border-radius:999px;padding:5px 12px}
+.pill.on{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+#rec.on{background:var(--rec);border-color:var(--rec);color:#fff}
+.field{font-size:12px;display:flex;align-items:center;gap:6px;border:1px solid #45464d;border-radius:999px;padding:3px 6px 3px 12px}
+.field input{width:52px;font:inherit;border:0;background:#2c2d33;border-radius:999px;padding:3px 8px;color:var(--paper);font-variant-numeric:tabular-nums}
+.seg{display:inline-flex;border:1px solid #45464d;border-radius:999px;padding:2px}
+.seg button{font-family:var(--mono);font-size:12px;border:0;background:transparent;border-radius:999px;padding:4px 10px}
+.seg button.on{background:var(--paper);color:var(--ink)}
+
+/* plugin */
+.plugin{width:980px;height:736px;background:var(--paper);color:var(--ink);border-radius:20px;padding:20px 22px 22px;box-shadow:0 0 0 5px var(--ink) inset;display:flex;flex-direction:column;gap:10px}
+.plugin.open{}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.logo{color:var(--ink);line-height:.9;margin:0}
+.logo small{display:block;font-family:"Rubik",var(--logo);font-weight:900;font-size:17px;letter-spacing:.01em;color:var(--jelly);margin-bottom:-2px}
+.logo span{display:block;font-family:"Rubik",var(--logo);font-weight:900;font-size:56px;letter-spacing:-.015em;line-height:.86}
+.brand{display:flex;flex-direction:column;gap:6px}
+.tagline{margin:0;font-family:var(--mono);font-weight:400;font-size:12.5px;letter-spacing:.19em;text-transform:uppercase;color:#6d6963}
+
+
+
+
+.ctlbtn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:0;padding:0;margin:4px -6px 0 0;color:var(--ink);font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.cknob{display:block;filter:drop-shadow(0 3px 0 rgba(17,17,17,.08))}
+.cknob svg{display:block;overflow:visible}
+.lid{transform-origin:62px 30px;transform-box:view-box;transition:transform .3s cubic-bezier(.3,1.6,.5,1);animation:lidjig 6s ease-in-out 1.5s infinite}
+@keyframes lidjig{0%,86%,100%{transform:none}88%{transform:translateY(-3px) rotate(-3deg)}90%{transform:none}92%{transform:translateY(-2px) rotate(2deg)}94%{transform:none}}
+.steam path{opacity:0;animation:steam 3s ease-out infinite}
+.steam path:nth-child(2){animation-delay:.6s}.steam path:nth-child(3){animation-delay:1.2s}
+@keyframes steam{0%{opacity:0;transform:translateY(6px)}30%{opacity:.9}100%{opacity:0;transform:translateY(-8px)}}
+.ctlbtn:hover .lid{animation:none;transform:translateY(-4px) rotate(-6deg)}
+.ctlbtn:active .lid{transform:translateY(-1px)}
+.plugin.open .lid{animation:none;transform:translate(4px,-6px) rotate(16deg)}
+.plugin.open .steam path{animation-duration:1.6s}
+.ctxt{border-bottom:2px solid var(--pink);padding-bottom:1px}
+.body{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start;flex:1}
+.spooncol{transition:transform .5s cubic-bezier(.45,0,.2,1)}
+.plugin:not(.open) .spooncol{transform:translate(var(--home-dx,290px),var(--home-dy,40px)) scale(1.32)}
+.drawer{transition:opacity .4s ease .08s, transform .5s cubic-bezier(.45,0,.2,1), visibility 0s linear 0s}
+.plugin:not(.open) .drawer{opacity:0;transform:translateX(60px);pointer-events:none;visibility:hidden;transition:opacity .25s ease, transform .4s cubic-bezier(.45,0,.2,1), visibility 0s linear .4s}
+
+.spooncol{display:flex;flex-direction:column;align-items:center;gap:8px}
+.spoonwrap{position:relative;width:340px;height:440px}
+.spoonwrap svg{position:absolute;inset:0;overflow:visible}
+.dancer{position:absolute;left:318px;top:250px;width:184px;height:184px;pointer-events:none;isolation:isolate;transition:opacity .35s ease .3s,visibility 0s linear 0s}
+.plugin.open .dancer{opacity:0;visibility:hidden;transition:opacity .15s ease,visibility 0s linear .15s}
+.dancer::before{content:"";position:absolute;left:24%;right:24%;bottom:2.5%;height:6%;border-radius:50%;background:rgba(80,60,80,.18);z-index:-1}
+.dz{position:absolute;inset:0;background-repeat:no-repeat;background-size:800% 100%;background-position:0% 0}
+.dz.base{background-image:url(dancer.png)}
+.dz.tint{background-color:var(--jelly);-webkit-mask-image:url(dancer-mask.png);mask-image:url(dancer-mask.png);-webkit-mask-size:800% 100%;mask-size:800% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:0% 0;mask-position:0% 0;mix-blend-mode:multiply}
+#tap{position:absolute;left:104px;top:190px;width:84px;height:128px;transform:rotate(35deg);border-radius:46% 46% 50% 50%;border:0;background:transparent;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+#tap:focus,#tap:focus-visible{outline:none}
+.under{display:flex;gap:8px;align-items:center;min-height:24px;font-size:11px;color:var(--soft);font-variant-numeric:tabular-nums}
+.badge{font-size:10.5px;font-weight:700;letter-spacing:.08em;background:var(--ink);color:var(--pink);border-radius:999px;padding:3px 9px}
+.badge[hidden]{display:none}
+
+/* drawer */
+.drawer{background:var(--paper-2);border-radius:14px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:14px;border:2px solid var(--ink)}
+
+.tabs{display:flex;gap:6px}
+.tab{font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;border:2px solid var(--ink);background:transparent;border-radius:999px;padding:5px 14px;display:inline-flex;align-items:center;gap:6px}
+.tab[aria-selected="true"]{background:var(--ink);color:#fff}
+.tab .dot{width:7px;height:7px;border-radius:50%;background:var(--pink);display:none}
+.tab.autoon .dot{display:block}
+.panel[hidden]{display:none}
+.panel{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:center}
+.knobbox{display:flex;flex-direction:column;align-items:center;gap:4px}
+.knob{width:92px;height:92px;touch-action:none;cursor:ns-resize;border-radius:50%}
+.klabel{font-size:12px;font-weight:700;letter-spacing:.04em}
+.kval{font-size:11px;color:var(--soft);font-variant-numeric:tabular-nums;min-height:1.2em}
+.chip{font-family:var(--mono);font-size:12px;border:2px solid var(--ink);background:var(--paper);border-radius:8px;padding:6px 10px;display:inline-flex;align-items:center;gap:8px}
+.chip b{font-weight:700}
+.chip .caret{font-size:9px}
+.chip.learning{background:var(--pink)}
+.lbl2{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+.ctlgroup{display:flex;flex-direction:column;align-items:center;gap:5px}
+
+.lanewrap{position:relative}
+#tl{width:100%;height:150px;display:block;border-radius:10px;background:var(--paper);border:2px solid var(--ink);touch-action:none}
+.lanewrap{display:flex;flex-direction:column;gap:8px;position:relative}
+.tools{display:inline-flex;border:2px solid var(--ink);border-radius:10px;overflow:hidden}
+.tools button{width:38px;height:32px;display:grid;place-items:center;border:0;background:var(--paper);padding:0}
+.tools button+button{border-left:2px solid var(--ink)}
+.tools button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.tools button[aria-pressed="true"] svg .pk{fill:var(--pink)}
+.zoomov{position:absolute;right:10px;display:flex;flex-direction:column;gap:4px;z-index:4}
+.zoomov button{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--ink);background:rgba(244,242,238,.85);font-family:var(--mono);font-size:14px;font-weight:700;line-height:1;display:grid;place-items:center;padding:0}
+.zoomov button:hover{background:#fff}
+.zoomov button:disabled{opacity:.3;cursor:default}
+.zoomov button[hidden]{display:none}
+.zoom{display:inline-flex;border:1.5px solid var(--ink);border-radius:8px;overflow:hidden}
+.zoom button{font-family:var(--mono);font-size:12px;font-weight:700;border:0;background:var(--paper);padding:4px 9px}
+.zoom button+button{border-left:1.5px solid var(--ink)}
+.zoom button:hover{background:#fff}
+.zoom button:disabled{opacity:.35;cursor:default}
+.hscroll{height:10px;border-radius:999px;background:rgba(17,17,17,.08);position:relative;touch-action:none}
+.hscroll[hidden]{display:none}
+.hscroll i{position:absolute;top:0;bottom:0;border-radius:999px;background:var(--ink);cursor:grab;display:block}
+.selbar{position:absolute;display:flex;align-items:center;gap:4px;background:var(--paper);border:2px solid var(--ink);border-radius:10px;padding:4px 5px 4px 10px;box-shadow:3px 3px 0 var(--pink);font-size:11px;z-index:5;white-space:nowrap}
+.selbar[hidden]{display:none}
+.selbar span{color:var(--soft);margin-right:4px}
+.selbar button{font-family:var(--mono);font-size:11.5px;border:1.5px solid var(--ink);background:transparent;border-radius:6px;padding:3px 7px}
+.selbar button:hover{background:#fff}
+.selbar button.on{background:var(--ink);color:#fff}
+.selbar .del{border-color:var(--rec);color:var(--rec);margin-left:4px}
+.lanehead{display:flex;justify-content:space-between;align-items:center}
+.laneicons{display:flex;gap:6px}
+.lanetools{display:flex;align-items:center;gap:8px}
+.lanetools .lbl2{font-size:10px}
+.chip.sm{padding:3px 8px;font-size:11px;border-width:1.5px}
+.iconbtn{width:32px;height:32px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);display:grid;place-items:center;padding:0}
+.iconbtn:hover{background:#fff}
+#recIcon i{width:12px;height:12px;border-radius:50%;background:var(--rec);display:block}
+#recIcon.on{background:var(--rec);border-color:var(--rec)}
+#recIcon.on i{background:#fff;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.2}}
+.toast{position:absolute;left:10px;bottom:10px;font-size:11px;background:var(--ink);color:#fff;border-radius:999px;padding:4px 6px 4px 12px;display:flex;align-items:center;gap:8px}
+.toast[hidden]{display:none}
+.toast button{font:inherit;font-weight:700;background:var(--pink);color:var(--ink);border:0;border-radius:999px;padding:2px 10px}
+.drawerhead{display:flex;justify-content:space-between;align-items:center}
+.drawerhead .ttl{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.hist{display:flex;gap:6px;align-items:center}
+.txtbtn{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;height:32px;border:2px solid var(--ink);background:var(--paper);border-radius:999px;padding:0 12px}
+.txtbtn:hover{background:#fff}
+.hist .iconbtn:disabled{opacity:.3;cursor:default}
+.vsep{width:2px;align-self:stretch;background:rgba(17,17,17,.12);border-radius:2px}
+.autobox{display:flex;align-items:center;gap:12px}
+.hint{font-size:10.5px;color:var(--soft);text-align:center;margin:0;line-height:1.6}
+
+/* auto */
+.switch{display:inline-flex;align-items:center;gap:12px;border:0;background:transparent;padding:0}
+.switch .track{width:58px;height:32px;border-radius:999px;border:2px solid var(--ink);background:var(--paper);position:relative;transition:background .15s}
+.switch .knobdot{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--ink);transition:left .15s}
+.switch[aria-checked="true"] .track{background:var(--pink)}
+.switch[aria-checked="true"] .knobdot{left:29px}
+.switch .swlbl{font-weight:700;font-size:13px;letter-spacing:.1em}
+.blendbox{display:flex;align-items:center;gap:10px}
+.knobbox:has(.unitsw){position:relative}
+.unitsw{position:absolute;left:50%;top:100%;transform:translate(-50%,2px);display:inline-flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
+.unitsw button{font-family:var(--mono);font-size:10.5px;border:0;background:transparent;padding:1px 8px;line-height:1.5}
+.unitsw button.on{background:var(--ink);color:#fff}
+.blendcol{gap:4px}
+.blendcol.off{opacity:.45}
+.blendrow{display:flex;align-items:center;gap:6px}
+.whisk{display:block}
+#whiskWires{transform-box:fill-box;transform-origin:50% 100%}
+.blendhint{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);background:var(--pink-soft);border-radius:999px;padding:1px 8px}
+.blender{position:relative;width:46px;height:110px;border:2px solid var(--ink);border-radius:9px 9px 13px 13px;background:var(--paper);touch-action:none;cursor:grab;overflow:hidden}
+.blender.off{opacity:.4}
+.blender .bmid{position:absolute;left:5px;right:5px;top:50%;border-top:1.5px dashed rgba(17,17,17,.35)}
+.blender .bfu{position:absolute;left:0;right:0;bottom:50%;height:0;background:var(--pink)}
+.blender .bfd{position:absolute;left:0;right:0;top:50%;height:0;background:var(--pink-soft)}
+.blender .bknob{position:absolute;left:4px;right:4px;height:24px;border-radius:7px;background:var(--ink);display:flex;align-items:center;justify-content:center;gap:3px}
+.blender .bknob i{display:block;width:2px;height:10px;background:#fff;border-radius:1px}
+.blendread{font-size:11px;color:var(--soft);font-variant-numeric:tabular-nums;min-width:44px;text-align:center}
+.autonote{font-size:11.5px;color:var(--soft);text-align:center;margin:0;max-width:44ch;align-self:center;line-height:1.6}
+
+/* popover */
+.pop{position:fixed;z-index:20;transform-origin:top left;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:10px;box-shadow:4px 4px 0 var(--pink);padding:8px;display:grid;grid-template-columns:repeat(6,auto);gap:6px}
+.pop[hidden]{display:none}
+.pop button{font-family:var(--mono);font-size:12px;border:1.5px solid var(--ink);background:transparent;border-radius:6px;padding:6px 8px;min-width:52px}
+.pop button.on{background:var(--ink);color:#fff}
+.pop .act{grid-column:1/-1;margin-top:4px;font-weight:700;background:var(--pink)!important;border:2px solid var(--ink)!important;padding:8px!important}
+.pop .act:disabled{opacity:.35;cursor:default}
+.pop .wide{grid-column:span 2}
+.pop .sep{grid-column:1/-1;font-size:10px;letter-spacing:.12em;color:var(--soft);padding:2px 2px 0}
+
+/* notes */
+.notes{font-family:var(--heb);color:#d9d6cf;font-size:15px;line-height:1.65;max-width:65ch;display:flex;flex-direction:column;gap:14px}
+.notes h2{font-size:16px;margin:0 0 4px;color:#fff;text-wrap:balance}
+.notes ol{margin:0;padding-inline-start:1.3em;display:flex;flex-direction:column;gap:4px}
+.notes kbd{font-family:var(--mono);font-size:12px;background:#3a3b41;border-radius:4px;padding:1px 5px;color:#fff}
+.fb{display:flex;flex-direction:column;gap:8px}
+.fb textarea{font-family:var(--heb);font-size:14px;min-height:96px;border-radius:10px;border:1px solid #45464d;background:#18191d;color:var(--paper);padding:10px;resize:vertical}
+.fb .frow{display:flex;gap:10px;align-items:center}
+.fb button{font-family:var(--heb);font-size:14px;font-weight:600;background:var(--pink);color:var(--ink);border:0;border-radius:999px;padding:7px 16px}
+#copyMsg{font-size:13px;color:#bdb7aa}
+
+
+@media (prefers-reduced-motion:reduce){ .plugin,.switch .track,.switch .knobdot{transition:none} #recIcon.on i{animation:none} }
+</style>
+<link rel="stylesheet" href="web.css">
+<script src="host.js"></script>
+</head>
+<body>
+<div id="wb-bar" role="group" aria-label="Demo player">
+  <span class="wb-brand">THE SPOON · BROWSER DEMO</span>
+  <button id="wb-play" type="button">&#9654; Play</button>
+  <label for="wb-bpm">BPM <input id="wb-bpm" type="number" min="60" max="180" value="120"></label>
+  <span class="seg" role="group" aria-label="Sound"><button id="wb-pad" type="button" class="on">Demo pad</button><button id="wb-own" type="button">Your track…</button></span>
+  <input id="wb-file" type="file" accept="audio/*" hidden>
+  <button id="wb-kick" type="button" class="on" aria-pressed="true">Kick</button>
+  <div id="wb-status"></div>
+</div>
+
+<main class="wrap">
+  <div class="daw" role="group" aria-label="DAW simulation">
+    <span class="lbl">DAW (simulation)</span>
+    <button id="play" class="pill" type="button">▶ Play</button>
+    <button id="rec" class="pill" type="button">● Rec</button>
+    <label class="field" for="bpm">BPM <input id="bpm" type="number" min="60" max="180" value="120"></label>
+    <div class="seg" id="source" role="group" aria-label="Source">
+      <button type="button" data-v="pad" class="on">Demo pad</button>
+      <button type="button" data-v="file">Your loop…</button>
+    </div>
+    <input id="file" type="file" accept="audio/*" hidden>
+    <button id="kick" class="pill on" type="button" aria-pressed="true">Kick</button>
+  </div>
+
+  <section class="plugin" id="plugin" aria-label="The Spoon prototype">
+    <header class="top">
+      <div class="brand"><h1 class="logo"><small>THE</small><span>SPOON</span></h1><p class="tagline">Play your sidechain</p></div>
+      <button id="ctlBtn" class="ctlbtn" type="button" aria-expanded="false" aria-controls="drawer" title="Open the lid: all the controls">
+        <span class="cknob"><svg viewBox="0 0 80 72" width="104" height="94" aria-hidden="true" style="overflow:visible"><g stroke="#111" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+          <g class="steam" fill="none" stroke="var(--jelly)" stroke-width="2.6"><path d="M30 11 q-4 -6 0 -10"/><path d="M40 9 q-4 -6 0 -10"/><path d="M50 11 q-4 -6 0 -10"/></g>
+          <g class="lid"><path d="M14 30 Q40 12 66 30 Z" fill="#f7f5f1"/><rect x="34" y="14" width="12" height="6" rx="3" fill="#111"/><path d="M24 26 Q34 20 42 19" fill="none" stroke="#fff" stroke-width="2.5"/></g>
+          <rect x="12" y="30" width="56" height="7" rx="3" fill="#dcd8d2"/>
+          <path d="M15 37 h50 v20 q0 9 -9 9 h-32 q-9 0 -9 -9z" fill="var(--jelly)"/>
+          <path d="M4 41 h11 M65 41 h11" stroke-width="4"/>
+          <path d="M22 44 v12" stroke="#fff" stroke-width="3" opacity=".7"/></g></svg></span>
+        <span class="ctxt">Control stuff</span>
+      </button>
+    </header>
+
+    <div class="body">
+      <div class="spooncol">
+        <div class="spoonwrap" id="spoonwrap">
+          <svg viewBox="0 0 340 440" width="340" height="440" aria-hidden="true">
+            <defs>
+              <clipPath id="bowlClip"><path d="M0 0 C42 0 66 44 66 104 C66 158 38 196 9 206 L-9 206 C-38 196 -66 158 -66 104 C-66 44 -42 0 0 0 Z" transform="translate(70 290) rotate(-145) scale(.68)"/></clipPath>
+              <clipPath id="fillClip"><rect id="fillClipRect" x="0" y="296" width="340" height="0"/></clipPath>
+              <linearGradient id="cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".06" stop-color="#d9d6d2"/><stop offset=".1" stop-color="#f7f5f2"/><stop offset="1" stop-color="#e6e1da"/></linearGradient>
+              <clipPath id="dishClip"><path d="M14 300 L326 300 Q322 330 300 404 Q296 420 280 420 L60 420 Q44 420 40 404 Q18 330 14 300 Z"/></clipPath>
+              <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e3e1dc"/><stop offset=".35" stop-color="#ffffff"/><stop offset=".7" stop-color="#e8e6e1"/><stop offset="1" stop-color="#cfccc6"/></linearGradient>
+              <radialGradient id="dip" cx="60%" cy="40%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dcd9d3"/></radialGradient>
+              <linearGradient id="jelly" x1="0" y1="0" x2="0" y2="1"><stop id="jst0" offset="0" stop-color="#ff6aae"/><stop id="jst1" offset=".6" stop-color="#ff3f92"/><stop id="jst2" offset="1" stop-color="#d9206f"/></linearGradient>
+            </defs>
+            <!-- dish of pink pudding -->
+            <ellipse cx="170" cy="425" rx="152" ry="8" fill="rgba(80,60,80,.18)"/>
+            <path d="M14 300 L326 300 Q322 330 300 404 Q296 420 280 420 L60 420 Q44 420 40 404 Q18 330 14 300 Z" fill="url(#cream)" stroke="var(--ink)" stroke-width="5" stroke-linejoin="round"/>
+            <g clip-path="url(#dishClip)">
+              <path id="pudBody" d="" fill="url(#jelly)"/>
+              <path id="pudShine" d="" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/>
+              <path id="pudSurf" d="" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linejoin="round"/>
+            </g>
+            <path d="M14 300 L326 300" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
+            <path d="M40 318 Q34 350 48 392" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".7"/>
+            <!-- the spoon: dips by how much the sound is going down right now -->
+            <g id="press">
+              <image href="spoon.png" x="90" y="39" width="207" height="280" style="filter:drop-shadow(-5px 7px 4px rgba(17,17,17,.16))"/>
+              <text x="148" y="262" text-anchor="middle" font-family="Rubik, Arial Black, sans-serif" font-weight="900" font-size="25" fill="var(--ink)">TAP</text>
+            </g>
+            
+            <g id="drops"></g>
+          </svg>
+          <div class="dancer" id="dancer" aria-hidden="true"><div class="dz base" id="dzBase"></div><div class="dz tint" id="dzTint"></div></div>
+          <button id="tap" type="button" aria-label="Tap to duck"></button>
+        </div>
+        <div class="under"><span id="gr">0.0 dB</span><span class="badge" id="autoBadge" hidden>AUTO 1/4</span></div>
+      </div>
+
+      <div class="drawer" id="drawer" hidden>
+        <div class="drawerhead">
+          <span class="ttl">Control stuff</span>
+          <div class="hist">
+            <button class="txtbtn" id="resetBtn" type="button" title="Back to the starting settings (keeps your taps)">Default</button>
+            <button class="iconbtn" id="undoBtn" type="button" title="Undo (Cmd/Ctrl+Z)" aria-label="Undo" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7H4v-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 3)"/><path d="M4 10a8 8 0 1 1 2.3 5.7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+            <button class="iconbtn" id="redoBtn" type="button" title="Redo (Cmd/Ctrl+Shift+Z)" aria-label="Redo" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="transform:scaleX(-1)"><path d="M9 7H4v-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 3)"/><path d="M4 10a8 8 0 1 1 2.3 5.7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="knobbox">
+            <div class="klabel">How long?</div>
+            <div class="knob" id="kRelease" tabindex="0" role="slider" aria-label="How long?"></div>
+            <div class="kval" id="vRelease"></div>
+            <div class="unitsw" id="relUnit" role="group" aria-label="How long in ms or notes"><button type="button" data-u="ms" class="on">ms</button><button type="button" data-u="note" title="Length in notes, follows the tempo">♪</button></div>
+          </div>
+          <div class="knobbox">
+            <div class="klabel">How deep?</div>
+            <div class="knob" id="kDepth" tabindex="0" role="slider" aria-label="How deep?"></div>
+            <div class="kval" id="vDepth"></div>
+          </div>
+          <div class="knobbox">
+            <div class="klabel">How soft?</div>
+            <div class="knob" id="kSoft" tabindex="0" role="slider" aria-label="How soft?"></div>
+            <div class="kval" id="vSoft"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="ctlgroup">
+            <span class="lbl2">Grid</span>
+            <button class="chip" id="gridBtn" type="button" aria-haspopup="true"><b id="gridVal">1/8</b><span class="caret">▼</span></button>
+          </div>
+          <div class="ctlgroup">
+            <span class="lbl2">Tap with</span>
+            <button class="chip" id="learnBtn" type="button" title="Click, then hit a key or a pad"><span id="learnVal">T</span></button>
+          </div>
+          <div class="vsep" aria-hidden="true"></div>
+          <div class="ctlgroup">
+            <span class="lbl2">Auto-scoop · every</span>
+            <div class="autobox">
+              <button class="switch" id="autoSw" role="switch" aria-checked="false" aria-label="Auto-scoop" type="button"><span class="track"><span class="knobdot"></span></span></button>
+              <button class="chip" id="rateBtn" type="button" aria-haspopup="true"><b id="rateVal">1/4</b><span class="caret">▼</span></button>
+            </div>
+          </div>
+          <div class="ctlgroup blendcol" id="blendcol">
+            <span class="lbl2">Speed blender</span>
+            <div class="blendrow">
+              <div class="knob" id="kBlend" tabindex="0" role="slider" aria-label="Speed blender" title="Drag up = faster, down = slower. Springs back when you let go."></div>
+              <svg class="whisk" viewBox="0 0 36 72" width="30" height="60" aria-hidden="true">
+                <g id="whiskWires">
+                  <path d="M18 4 C6 4 4 20 8 32 C11 40 15 43 18 44 C21 43 25 40 28 32 C32 20 30 4 18 4 Z" fill="none" stroke="var(--ink)" stroke-width="1.8"/>
+                  <path d="M18 4 C11 6 10 22 13 33 C15 39 17 43 18 44 C19 43 21 39 23 33 C26 22 25 6 18 4 Z" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+                  <path d="M18 4 V44" stroke="var(--ink)" stroke-width="1.3"/>
+                </g>
+                <rect x="15.5" y="44" width="5" height="5" rx="1" fill="var(--soft)"/>
+                <rect x="17.2" y="49" width="1.6" height="6" fill="var(--ink)"/>
+                <path d="M10 70 V61 C10 56 13.5 54 18 54 C22.5 54 26 56 26 61 V70 Z" fill="var(--ink)"/>
+              </svg>
+            </div>
+            <span class="blendread" id="blendRead">1/4</span>
+          </div>
+        </div>
+
+        <div class="lanewrap">
+          <div class="lanehead">
+            <div class="lanetools">
+              <div class="tools" role="group" aria-label="Edit tool">
+                <button type="button" id="toolSel" aria-pressed="true" title="Select, move, stretch" aria-label="Select tool">
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8-6.5 1.5L10 19z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button type="button" id="toolPen" aria-pressed="false" title="Draw taps" aria-label="Pencil tool">
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path class="pk" d="M4 20l1.2-4.6L15.5 5.1a2 2 0 0 1 2.8 0l.6.6a2 2 0 0 1 0 2.8L8.6 18.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.5 7l3.5 3.5" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+                <button type="button" id="toolErase" aria-pressed="false" title="Erase taps" aria-label="Eraser tool">
+                  <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path class="pk" d="M3 16.5 13.5 6a2 2 0 0 1 2.8 0l3.7 3.7a2 2 0 0 1 0 2.8L12 20.5H7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 11 15 17.5" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+              </div>
+              <div class="modesw" id="modeSw" role="group" aria-label="Taps play as">
+                <button type="button" data-m="pattern" class="on" title="A 4-bar loop that repeats all song">Pattern</button>
+                <button type="button" data-m="song" title="Tap along the whole song: every tap stays where you played it">Song</button>
+              </div>
+            </div>
+            <div class="laneicons">
+              <button class="iconbtn" id="recIcon" type="button" aria-pressed="false" title="Record taps (R)" aria-label="Record taps"><i></i></button>
+              <button class="iconbtn" id="eraseIcon" type="button" title="Clear all taps" aria-label="Clear all taps">
+                <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M10 11v6M14 11v6" stroke="var(--pink)" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <canvas id="tl" tabindex="0" aria-label="Your taps on the 4-bar loop: pink scoops are where the sound is dug out"></canvas>
+          <div class="zoomov" role="group" aria-label="Zoom">
+            <button type="button" id="zoomIn" title="Zoom in (Cmd/Ctrl + scroll)" aria-label="Zoom in">+</button>
+            <button type="button" id="zoomOut" title="Zoom out" aria-label="Zoom out">−</button>
+            <button type="button" id="zoomFit" title="Show all 4 bars" aria-label="Show all" hidden>
+              <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="hscroll" id="hscroll" hidden><i id="hthumb"></i></div>
+          <div class="selbar" id="selbar" hidden>
+            <span id="selCount">1 tap</span>
+            <button type="button" data-len="2">1/2</button><button type="button" data-len="1">1/4</button><button type="button" data-len="0.5">1/8</button><button type="button" data-len="0.25">1/16</button><button type="button" data-len="0.125">1/32</button>
+            <button type="button" class="del" id="selDel" title="Delete (Delete key)">Delete</button>
+          </div>
+        </div>
+        <p class="hint">Zoom: Cmd/Ctrl + scroll or pinch, scroll to move · Arrow: click or box-select taps, drag to move, drag an edge to stretch, pick a length · Pencil: click or drag to draw · Eraser: click or sweep to delete</p>
+      </div>
+    </div>
+  <i class="ver" id="ver"></i>
+  </section>
+
+
+  <aside class="notes" dir="rtl">
+    <div>
+      <h2>מה זה</h2>
+      <p style="margin:0">אב-טיפוס של The Spoon: פלאגין שמנחית את הסאונד כשלוחצים, כמו sidechain שמנגנים ביד במקום להגדיר. בגרסה האמיתית הוא יושב על ערוץ ב-DAW. כאן הפס הכהה למעלה מדמה את ה-DAW.</p>
+    </div>
+    <div>
+      <h2>איך לנסות</h2>
+      <ol>
+        <li>לוחצים <b>Play</b> (או <kbd>Enter</kbd>). יש פד דמו וקיק שלא מונחת, כדי לשמוע את הגריד.</li>
+        <li>לוחצים על הכף או על <kbd>T</kbd>. טאפ קצר עושה בור קצר, והחזקה עושה בור ארוך. הכף צוללת לפודינג בכל פעם שהסאונד יורד, גם בהקלטה וגם ב-Auto-scoop.</li>
+        <li><b>Control stuff</b> פותח את ההגדרות ליד הכף, כך שאפשר להמשיך לנגן ולשמוע כל שינוי. יש Undo/Redo לכל שינוי (גם <kbd>Cmd/Ctrl+Z</kbd>).</li>
+        <li>במסלול: העיגול האדום מקליט (או <kbd>R</kbd>), והמחק מוחק הכל. רואים את הסאונד בשחור, ואת הבורות שנחפרו בו בוורוד. שלושה כלים מעל המסלול: <b>חץ</b> (קליק או גרירת מלבן לבחירה, גרירה להזזה, גרירת קצה למתיחה), <b>עיפרון</b> (קליק או גרירה מציירים טאפ) ו<b>מחק</b> (קליק או העברה מוחקים). כשבוחרים טאפים מופיע סרגל עם 1/2 עד 1/32, שמשנה את האורך שלהם בקליק אחד. הפח מנקה הכל.</li>
+        <li><b>Grid</b> קובע לאן הטאפים נצמדים, גם כשמנגנים וגם כשעורכים במסלול (או Free). שינוי שלו לא מזיז טאפים שכבר הוקלטו. <b>Tap with</b>: לוחצים ואז מכים על מקש או על פד MIDI.</li>
+        <li>שלוש שאלות: <b>How long?</b> (כמה זמן לוקח לחזור, במילישניות, או בתווים עם המתג ♪ שמתחת לנוב: אז החזרה היא פאמפ שמסתיים בדיוק בסוף התו), <b>How deep?</b> (כמה עמוק הבור), <b>How soft?</b> (כמה בעדינות נכנסים אליו).</li>
+        <li><b>Auto-scoop</b>: הכף גורפת לבד כל רבע, שמינית וכו׳, ואפשר להוסיף טאפים מעל.</li>
+        <li><b>Speed blender</b> (הנוב עם הקפיץ והמטרפה, ליד Auto-scoop): גוררים למעלה כדי להאיץ עד 1/64, כמו ריזר, או למטה כדי להאט. הקפיץ נמתח, וכשעוזבים הוא קופץ חזרה לקצב שבחרת.</li>
+      </ol>
+    </div>
+    <div class="fb">
+      <h2>הערות ליונתן</h2>
+      <label for="fbText" style="font-size:14px;color:#bdb7aa">מה הרגיש טוב, מה הציק, מה חסר? כותבים כאן, מעתיקים ושולחים לו.</label>
+      <textarea id="fbText" placeholder="למשל: ה-Release הארוך מרגיש…"></textarea>
+      <div class="frow"><button id="copyFb" type="button">העתק הערות</button><span id="copyMsg" role="status"></span></div>
+    </div>
+  </aside>
+</main>
+<p class="wb-foot">Tap the spoon, press T, or play a MIDI note (Chrome). Space = play / stop. MANYUKO</p>
+
+<div class="pop" id="pop" role="menu" hidden></div>
+
+
+<script>
+(function(){
+"use strict";
+let LOOP = 16; // Pattern: 4 bars (from the DAW). Song: grows with the song.
+const TRIP=[["1/4T",2/3],["1/8T",1/3],["1/16T",1/6],["1/32T",1/12]], DOT=[["1/4D",1.5],["1/8D",0.75],["1/16D",0.375]];
+const GRIDS = [["Free",0],["1/2",2],["1/4",1],["1/8",0.5],["1/16",0.25],["1/32",0.125],["1/64",0.0625],...TRIP,...DOT];
+const RATES = [["1/2",2],["1/4",1],["1/8",0.5],["1/16",0.25],["1/32",0.125],["1/64",0.0625],...TRIP,["1/2D",3],...DOT];
+const S = { relSync:false, tapKey:{code:"KeyT",label:"T"}, midiNote:null, bpm:120, grid:0.5, gridName:"1/8", editGrid:0.5, editName:"1/8", release:250, depth:0.85, soft:0.007,
+            kick:true, playing:false, rec:false, source:"pad", events:[], auto:false, rate:1, rateName:"1/4", mode:"pattern" };
+const TAPS={pattern:[], song:[]};
+let ctx=null, master, duck, padBus, kickBus, preAn, pad=null, fileBuf=null, fileNode=null, voices=[];
+/* ---------- bridge to the plugin: the sound is made by the plugin, this page is only the screen ---------- */
+const JB = (window.__JUCE__ && window.__JUCE__.backend) || null;
+const INIT = (window.__JUCE__ && window.__JUCE__.initialisationData) || {};
+let rid = 1, fromHost = false;
+function nat(name, ...params){ if(JB) JB.emitEvent("__juce__invoke", { name, params, resultId: rid++ }); }
+function sendParam(id, v){ if(!fromHost) nat("setParam", id, v); }
+const HOST = { gain: 1, bpm: 120, playing: false };
+const GRID_IDX = n => Math.max(0, GRIDS.findIndex(g => g[0]===n));
+const RATE_IDX = n => Math.max(0, RATES.findIndex(r => r[0]===n));
+const blend={pos:0,drag:false,raf:0};
+let lastAutoBeat=-1e9;
+let t0=0, nextBeat=0, schedBeat=0, nextAuto=0, timer=null, live=null, learning=false;
+const $ = id => document.getElementById(id);
+const C = { ink:"#111111", soft:"#7a766f", pink:"#ff4f9a", paper:"#f4f2ee", rec:"#e0313f" };
+
+/* ---------- audio graph ---------- */
+function ensureCtx(){ return; }
+function ensureCtx_unused(){
+  if(!ctx){
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const lim = ctx.createDynamicsCompressor();
+    lim.threshold.value=-8; lim.ratio.value=8; lim.attack.value=0.003; lim.release.value=0.12;
+    master = ctx.createGain(); master.gain.value=0.8;
+    master.connect(lim); lim.connect(ctx.destination);
+    duck = ctx.createGain(); duck.connect(master);
+    padBus = ctx.createGain(); padBus.gain.value=0.9; padBus.connect(duck);
+    preAn = ctx.createAnalyser(); preAn.fftSize=1024; padBus.connect(preAn);
+    pad = makePad(ctx, padBus);   // measures the track before the spoon
+    kickBus = ctx.createGain(); kickBus.gain.value=0.5; kickBus.connect(master); // kick is not ducked
+  }
+  if(ctx.state==="suspended") ctx.resume();
+}
+const spb = () => 60/S.bpm;
+const beatAt = t => (t-t0)/spb();
+const timeAt = b => t0 + b*spb();
+
+// Attack is fixed (smooth), but shortens itself on very fast grids so 1/64 still lands.
+const atkFor = stepBeats => stepBeats>0 ? Math.min(S.soft, stepBeats*spb()/10) : S.soft;
+const REL_NOTES=[["1/64",0.0625],["1/32",0.125],["1/16T",1/6],["1/16",0.25],["1/16D",0.375],["1/8T",1/3],["1/8",0.5],["1/8D",0.75],["1/4T",2/3],["1/4",1],["1/4D",1.5],["1/2",2]];
+function relNote(){ const n=Math.log(S.release/30)/Math.log(50); return REL_NOTES[Math.max(0,Math.min(REL_NOTES.length-1,Math.round(n*(REL_NOTES.length-1))))]; }
+const relMs = () => S.relSync ? relNote()[1]*spb()*1000 : S.release;
+const relTau = () => Math.max(0.005, relMs()/1000/4);
+// setTargetAtTime always starts from wherever the gain is now: the envelope never jumps, so no clicks.
+// In ♪ mode the return is a classic pump: starts slow, swells, and is fully back exactly at the end of the note.
+const pumpShape = x => x<=0?0 : x>=1?1 : x*x*(3-2*x);
+// We keep our own copy of the envelope, so in ♪ mode a new tap can cut into a pump exactly where it is (no jumps).
+let ENV=[];   // {t, v0, kind:"tgt"|"pump", to, tau, L}
+function envAt(t){
+  let s=null; for(const e of ENV) if(e.t<=t) s=e;
+  if(!s) return null;
+  const dt=t-s.t;
+  return s.kind==="tgt" ? s.to+(s.v0-s.to)*Math.exp(-dt/s.tau) : s.v0+(1-s.v0)*pumpShape(dt/s.L);
+}
+function envReset(){ ENV=[]; }
+// Cut the envelope at t: drop what comes later, and if we're in the middle of a pump, land exactly on it.
+function envCut(g,t){
+  const prev=[...ENV].reverse().find(e=>e.t<t), v0=envAt(t);
+  ENV=ENV.filter(e=>e.t<t); if(ENV.length>48) ENV=ENV.slice(-16);
+  g.cancelScheduledValues(t);
+  if(v0===null || !S.relSync && !(prev && prev.kind==="pump" && t<prev.t+prev.L)) return v0;
+  if(prev && prev.kind==="pump" && t<prev.t+prev.L) g.linearRampToValueAtTime(v0, t); else g.setValueAtTime(v0, t);
+  return v0;
+}
+function duckDown(t, atk){ const g=duck.gain, f=Math.max(0.0001,1-S.depth); const v0=envCut(g,t);
+  g.setTargetAtTime(f, t, atk); ENV.push({t, v0:v0===null?g.value:v0, kind:"tgt", to:f, tau:atk}); }
+function duckUp(t){ const g=duck.gain; const v0=envCut(g,t);
+  if(!S.relSync){ g.setTargetAtTime(1, t, relTau()); ENV.push({t, v0:v0===null?g.value:v0, kind:"tgt", to:1, tau:relTau()}); return; }
+  const L=Math.max(0.01, relMs()/1000), start=v0===null?g.value:v0, N=32;
+  for(let i=1;i<=N;i++) g.linearRampToValueAtTime(start+(1-start)*pumpShape(i/N), t+L*i/N);
+  ENV.push({t, v0:start, kind:"pump", L});
+}
+function triggerAt(t, holdSec, atk){ duckDown(t, atk); duckUp(t + Math.max(holdSec, atk*4)); }
+
+function kickAt(t){
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.frequency.setValueAtTime(130,t); o.frequency.exponentialRampToValueAtTime(42,t+0.12);
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(1,t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.32);
+  o.connect(g); g.connect(kickBus); o.start(t); o.stop(t+0.36);
+}
+const PROG=[[57,60,64,69],[53,57,60,65],[48,55,60,64],[55,59,62,67]]; // Am F C G
+function chordAt(t,bar){
+  const dur=4*spb();
+  const f=ctx.createBiquadFilter(); f.type="lowpass"; f.frequency.value=1500; f.Q.value=0.4;
+  const g=ctx.createGain();
+  g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.065,t+0.35);
+  g.gain.setValueAtTime(0.065,t+dur); g.gain.linearRampToValueAtTime(0.0001,t+dur+0.4);
+  f.connect(g); g.connect(padBus);
+  const os=[];
+  PROG[bar].forEach(m=>{
+    const hz=440*Math.pow(2,(m-69)/12);
+    [-8,8].forEach(c=>{ const o=ctx.createOscillator(); o.type="sawtooth"; o.frequency.value=hz; o.detune.value=c; o.connect(f); o.start(t); o.stop(t+dur+0.45); os.push(o); });
+  });
+  const v={o:os,g:g}; voices.push(v);
+  os[0].onended=()=>{ voices=voices.filter(x=>x!==v); };
+}
+function startFile(at){
+  stopFile(); if(!fileBuf) return;
+  fileNode=ctx.createBufferSource(); fileNode.buffer=fileBuf; fileNode.loop=true; fileNode.connect(padBus);
+  fileNode.start(Math.max(at,ctx.currentTime));
+}
+function stopFile(){ if(fileNode){ try{fileNode.stop();}catch(e){} fileNode.disconnect(); fileNode=null; } }
+
+/* ---------- taps are stored as recorded: locked to the grid at record time, never re-quantized later ---------- */
+const effBeat = ev => ev.b;
+const effLen = ev => ev.len;
+const lockLen = held => S.grid ? Math.max(S.grid, Math.round(held/S.grid)*S.grid) : held;
+function insideTap(beatInLoop){
+  for(const ev of S.events){
+    const s=effBeat(ev), e=s+Math.max(effLen(ev),0.05);
+    if((beatInLoop>=s-0.02 && beatInLoop<e) || (beatInLoop+LOOP>=s-0.02 && beatInLoop+LOOP<e)) return true;
+  }
+  return false;
+}
+
+/* ---------- speed blender: a spring-loaded push on top of the Auto-scoop rate ---------- */
+function effRate(){
+  const p=blend.pos; if(Math.abs(p)<0.001) return S.rate;
+  const span = p>0 ? Math.max(0,Math.log2(S.rate/0.0625)) : Math.max(0,Math.log2(2/S.rate));
+  return S.rate*Math.pow(2,-p*span);
+}
+
+/* ---------- transport + scheduler ---------- */
+function tick(){
+  return;
+  if(!S.playing) return;
+  const now=ctx.currentTime, bEnd=beatAt(now+(Math.abs(blend.pos)>0.001? 0.04 : 0.12));
+  while(nextBeat<bEnd){
+    const t=timeAt(nextBeat);
+    if(S.kick) kickAt(t);
+    if(S.source==="pad" && nextBeat%4===0) pad.chord(t,(nextBeat/4)%4,4*spb());
+    nextBeat++;
+  }
+  const hits=[];
+  if(schedBeat<bEnd){
+    const from=schedBeat, to=bEnd;
+    for(let k=Math.floor(from/LOOP); k<=Math.floor(to/LOOP); k++){
+      for(const ev of S.events){
+        if(ev.loop===k) continue; // don't double-play the pass it was recorded in
+        const abs=k*LOOP+effBeat(ev);
+        if(abs>=from && abs<to) hits.push({abs, len:effLen(ev)*spb(), atk:atkFor(0)});
+      }
+    }
+    schedBeat=to;
+  }
+  if(S.auto){
+    const blending=Math.abs(blend.pos)>0.001;
+    if(blending){ if(nextAuto < beatAt(now)) nextAuto=beatAt(now); }
+    else if(nextAuto < beatAt(now)-S.rate) nextAuto=Math.ceil(beatAt(now)/S.rate)*S.rate;
+    const holding = live && !live.skip;
+    while(nextAuto<bEnd){
+      const inLoop=((nextAuto%LOOP)+LOOP)%LOOP;
+      const r=effRate();
+      if(nextAuto>=0 && !holding && !insideTap(inLoop)) hits.push({abs:nextAuto, len:0, atk:atkFor(r)});
+      lastAutoBeat=nextAuto; nextAuto+=r;
+    }
+  }
+  hits.sort((a,b)=>a.abs-b.abs).forEach(h=>triggerAt(Math.max(timeAt(h.abs),now), h.len, h.atk));
+}
+function start(){ return; }
+function start_unused(){
+  ensureCtx(); if(S.playing) return;
+  S.playing=true; t0=ctx.currentTime+0.08; nextBeat=0; schedBeat=0; nextAuto=0;
+  duck.gain.cancelScheduledValues(0); duck.gain.setValueAtTime(1,ctx.currentTime); envReset();
+  if(S.source==="file") startFile(t0); else pad.start(t0);
+  timer=setInterval(tick,25); tick(); syncUI();
+}
+function stop(){ return; }
+function stop_unused(){
+  S.playing=false; clearInterval(timer); stopFile();
+  const now=ctx.currentTime;
+  voices.forEach(v=>{ try{ v.g.gain.cancelScheduledValues(0); v.g.gain.setTargetAtTime(0,now,0.03); v.o.forEach(o=>o.stop(now+0.2)); }catch(e){} });
+  voices=[]; pad.stop(now); S.rec=false;
+  duck.gain.cancelScheduledValues(0); duck.gain.setValueAtTime(1,now); envReset();
+  syncUI();
+}
+
+/* ---------- tapping: the plugin digs the hole, this only tells it when ---------- */
+let tapHeld=false;
+function tapDown(){ if(tapHeld) return; tapHeld=true; $("spoonwrap").classList.add("down"); nat("tap", true); }
+function tapUp(){ if(!tapHeld) return; tapHeld=false; $("spoonwrap").classList.remove("down"); nat("tap", false); }
+window.addEventListener("blur", tapUp);
+
+/* ---------- knobs ---------- */
+function arc(cx,cy,r,a0,a1){
+  const P=a=>[cx+r*Math.sin(a), cy-r*Math.cos(a)];
+  const [x0,y0]=P(a0),[x1,y1]=P(a1);
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${(a1-a0)>Math.PI?1:0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+}
+function knob(el, o){
+  const pid=o.pid;
+  const A0=-0.75*Math.PI, SPAN=1.5*Math.PI;
+  const toN=v=>o.log? Math.log(v/o.min)/Math.log(o.max/o.min) : (v-o.min)/(o.max-o.min);
+  const toV=n=>o.log? o.min*Math.pow(o.max/o.min,n) : o.min+(o.max-o.min)*n;
+  let n=toN(o.val); const n0=n;
+  let ticks="";
+  for(let i=0;i<=10;i++){ const a=A0+SPAN*i/10; const p1=[46+42*Math.sin(a),46-42*Math.cos(a)], p2=[46+45*Math.sin(a),46-45*Math.cos(a)]; ticks+=`<line x1="${p1[0].toFixed(1)}" y1="${p1[1].toFixed(1)}" x2="${p2[0].toFixed(1)}" y2="${p2[1].toFixed(1)}" stroke="rgba(17,17,17,.35)" stroke-width="1.5"/>`; }
+  el.innerHTML=`<svg viewBox="0 0 92 92" width="92" height="92" style="overflow:visible">
+    ${ticks}
+    <path d="${arc(46,46,36,A0,A0+SPAN)}" fill="none" stroke="rgba(17,17,17,.12)" stroke-width="5" stroke-linecap="round"/>
+    <path class="val" fill="none" stroke="${C.pink}" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="47" cy="48" r="27" fill="rgba(0,0,0,.18)"/>
+    <circle cx="46" cy="46" r="26" fill="#fff" stroke="${C.ink}" stroke-width="2.5"/>
+    <line class="ptr" x1="46" y1="42" x2="46" y2="24" stroke="${C.ink}" stroke-width="4" stroke-linecap="round"/>
+  </svg>`;
+  const val=el.querySelector(".val"), ptr=el.querySelector(".ptr");
+  function set(nn){
+    n=Math.min(1,Math.max(0,nn)); const a=A0+SPAN*n;
+    val.setAttribute("d", n>0.001? arc(46,46,36,A0,a) : "");
+    ptr.setAttribute("transform",`rotate(${a*180/Math.PI} 46 46)`);
+    const v=toV(n); el.setAttribute("aria-valuetext",o.fmt(v)); o.on(v); if(pid) sendParam(pid, v);
+  }
+  let sy=0, sn=0;
+  el.addEventListener("pointerdown",e=>{ el.setPointerCapture(e.pointerId); sy=e.clientY; sn=n; if(pid) nat("gesture",pid,true); });
+  el.addEventListener("pointerup",()=>{ if(pid) nat("gesture",pid,false); commit(); });
+  el.addEventListener("keyup",e=>{ if(e.key.startsWith("Arrow")) commit(); });
+  el.addEventListener("pointermove",e=>{ if(el.hasPointerCapture(e.pointerId)) set(sn+(sy-e.clientY)/(e.shiftKey?600:180)); });
+  el.addEventListener("dblclick",()=>{ set(n0); commit(); });
+  el.addEventListener("keydown",e=>{ if(e.key==="ArrowUp"||e.key==="ArrowRight"){set(n+0.02);e.preventDefault();} if(e.key==="ArrowDown"||e.key==="ArrowLeft"){set(n-0.02);e.preventDefault();} });
+  set(n);
+  return { setValue:v=>set(toN(v)) };
+}
+function showRel(){ sendParam("longUnit", S.relSync?1:0); $("vRelease").textContent = S.relSync ? relNote()[0] : `${Math.round(S.release)} ms`; $("relUnit").querySelectorAll("button").forEach(b=>b.classList.toggle("on",(b.dataset.u==="note")===S.relSync)); }
+const kRel=knob($("kRelease"),{pid:"howLong",min:30,max:1500,val:250,log:true,fmt:v=>`${Math.round(v)} ms`,on:v=>{S.release=v; showRel();}});
+$("relUnit").querySelectorAll("button").forEach(b=>b.onclick=()=>{ S.relSync=(b.dataset.u==="note"); showRel(); commit(); });
+const kSoft=knob($("kSoft"),{pid:"howSoft",min:1,max:80,val:7,log:true,fmt:v=>`${Math.round(v)} ms`,on:v=>{S.soft=v/1000; $("vSoft").textContent= v<4? "sharp" : v>40? "very soft" : `${Math.round(v)} ms`;}});
+const kDep=knob($("kDepth"),{pid:"howDeep",min:0,max:1,val:0.85,log:false,fmt:v=>`${Math.round(v*100)}%`,on:v=>{
+  S.depth=v; const db=v>=0.999? "−∞" : (20*Math.log10(1-v)).toFixed(1);
+  $("vDepth").textContent=`${Math.round(v*100)}% · ${db} dB`;
+}});
+
+/* ---------- undo / redo: every change you make, including Auto and knobs ---------- */
+const snap = () => JSON.stringify({events:S.events.map(e=>({b:e.b,len:e.len})), auto:S.auto, rate:S.rate, rateName:S.rateName, grid:S.grid, gridName:S.gridName, editGrid:S.editGrid, editName:S.editName, release:Math.round(S.release), relSync:S.relSync, depth:Math.round(S.depth*1000)/1000, soft:Math.round(S.soft*10000)/10000});
+let histCur=null; const undoStack=[], redoStack=[];
+let tapsSynced = !JB;   // don't send taps until the plugin has told us what it already has (else opening the window wiped them)
+function pushTaps(){
+  TAPS[S.mode]=S.events;
+  if(fromHost || !tapsSynced) return;
+  const flat=[]; for(const e of S.events){ flat.push(e.b, e.len); }
+  nat("setTaps", S.mode==="song"?1:0, flat);
+}
+function commit(){
+  pushTaps();
+  const now=snap(); if(histCur===null){ histCur=now; return; }
+  if(now===histCur) return;
+  undoStack.push(histCur); if(undoStack.length>200) undoStack.shift();
+  histCur=now; redoStack.length=0; histUI();
+}
+function applySnap(str){
+  const o=JSON.parse(str);
+  S.events=o.events.map(e=>({b:e.b,len:e.len,loop:-1})); sel.clear(); hover=null;
+  S.auto=o.auto; S.rate=o.rate; S.rateName=o.rateName; S.grid=o.grid; S.gridName=o.gridName; S.editGrid=o.grid; S.editName=o.gridName;
+  S.relSync=!!o.relSync; kRel.setValue(o.release); showRel(); kDep.setValue(o.depth); kSoft.setValue(o.soft*1000);
+  resyncAuto(); pushTaps();
+}
+function undo(){ if(!undoStack.length) return; redoStack.push(histCur); histCur=undoStack.pop(); applySnap(histCur); histUI(); }
+function redo(){ if(!redoStack.length) return; undoStack.push(histCur); histCur=redoStack.pop(); applySnap(histCur); histUI(); }
+function histUI(){ $("undoBtn").disabled=!undoStack.length; $("redoBtn").disabled=!redoStack.length; }
+
+/* ---------- drawer, transport UI ---------- */
+function syncUI(){
+  $("play").textContent=S.playing?"■ Stop":"▶ Play"; $("play").classList.toggle("on",S.playing);
+  $("rec").classList.toggle("on",S.rec);
+  $("recIcon").classList.toggle("on",S.rec); $("recIcon").setAttribute("aria-pressed",S.rec);
+}
+function setDrawer(on){
+  $("plugin").classList.toggle("open",on); $("ctlBtn").setAttribute("aria-expanded",on);
+  document.querySelector("#ctlBtn .ctxt").textContent = on ? "Jelly mode" : "Control stuff";
+  $("ctlBtn").title = on ? "Just the spoon, the jelly and the dancer" : "Open the lid: all the controls";
+  if(!on) closePop();
+  nat("uiState","drawerOpen", on?"1":"0");   // reopen the way you left it
+  requestAnimationFrame(reportSize);
+}
+const isOpen=()=>$("plugin").classList.contains("open");
+$("ctlBtn").onclick=()=>setDrawer(!isOpen());
+$("undoBtn").onclick=undo; $("redoBtn").onclick=redo;
+$("resetBtn").onclick=()=>{
+  S.grid=0.5; S.gridName="1/8"; S.editGrid=0.5; S.editName="1/8"; S.auto=false; S.rate=1; S.rateName="1/4";
+  S.relSync=false; kRel.setValue(250); showRel(); kDep.setValue(0.85); kSoft.setValue(7);
+  resyncAuto(); commit();
+};
+function toggleRec(){ S.rec=!S.rec; nat("rec", S.rec); syncUI(); }
+$("rec").onclick=toggleRec;
+$("recIcon").onclick=toggleRec;
+$("play").onclick=()=>{ S.playing?stop():start(); };
+$("kick").onclick=e=>{ S.kick=!S.kick; e.currentTarget.classList.toggle("on",S.kick); e.currentTarget.setAttribute("aria-pressed",S.kick); };
+
+$("eraseIcon").onclick=()=>{ if(!S.events.length) return; S.events=[]; sel.clear(); commit(); };
+
+$("bpm").onchange=e=>{
+  const v=Math.min(180,Math.max(60,parseFloat(e.target.value)||120)); e.target.value=v;
+  if(S.playing){ const b=beatAt(ctx.currentTime); S.bpm=v; t0=ctx.currentTime-b*spb(); } else S.bpm=v;
+};
+function setSource(v){
+  S.source=v; $("source").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.v===v));
+  pre.fill(0); preSeen.fill(0);
+  if(!ctx||!S.playing) return;
+  if(v==="file"){ pad.stop(ctx.currentTime); startFile(ctx.currentTime); } else { stopFile(); pad.start(ctx.currentTime); }
+}
+$("source").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  if(b.dataset.v==="file"){ ensureCtx(); $("file").click(); } else setSource("pad");
+});
+$("file").onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  ensureCtx();
+  const btn=$("source").querySelector('[data-v="file"]');
+  try{
+    const buf=await f.arrayBuffer();
+    fileBuf=await new Promise((res,rej)=>ctx.decodeAudioData(buf,res,rej));
+    btn.textContent=f.name.length>18? f.name.slice(0,16)+"…" : f.name;
+    setSource("file");
+  }catch(err){ btn.textContent="Can't read that file"; }
+};
+
+/* ---------- popover for Grid and Rate ---------- */
+const pop=$("pop"); let popFor=null;
+function openPop(anchor, list, current, onPick, action, up){
+  if(popFor===anchor){ closePop(); return; }
+  pop.innerHTML="";
+  const kind=n=>n.endsWith("T")?"T":n.endsWith("D")?"D":"S";
+  list.forEach(([name,val],i)=>{
+    const prev=i? list[i-1][0] : "";
+    if(i===0 || kind(name)!==kind(prev)){ const sep=document.createElement("div"); sep.className="sep"; sep.textContent={S:"STRAIGHT",T:"TRIPLET",D:"DOTTED"}[kind(name)]; pop.appendChild(sep); }
+    const b=document.createElement("button"); b.type="button"; b.textContent=name; b.setAttribute("role","menuitemradio");
+    if(name==="Free") b.classList.add("wide");
+    b.setAttribute("aria-checked", name===current); if(name===current) b.classList.add("on");
+    b.onclick=()=>{ onPick(name,val); closePop(); anchor.focus(); };
+    pop.appendChild(b);
+  });
+  if(action){
+    const a=document.createElement("button"); a.type="button"; a.className="act"; a.textContent=action.label; a.disabled=!!action.disabled;
+    if(action.title) a.title=action.title;
+    a.onclick=()=>{ action.run(); closePop(); anchor.focus(); };
+    pop.appendChild(a);
+  }
+  pop.hidden=false; popFor=anchor; pop.style.transform=`scale(${VIEW.s})`;
+  const r=anchor.getBoundingClientRect(), pw=pop.offsetWidth*VIEW.s, ph=pop.offsetHeight*VIEW.s;
+  let x=Math.min(window.innerWidth-pw-8, Math.max(8, r.left+r.width/2-pw/2));
+  let y= up? r.top-ph-8 : r.bottom+8;
+  if(up && y<8) y=r.bottom+8; else if(!up && y+ph>window.innerHeight-8) y=r.top-ph-8;
+  pop.style.left=x+"px"; pop.style.top=y+"px";
+  const on=pop.querySelector(".on")||pop.querySelector("button"); on && on.focus();
+}
+function closePop(){ pop.hidden=true; popFor=null; }
+document.addEventListener("pointerdown",e=>{ if(!pop.hidden && !pop.contains(e.target) && e.target.closest(".chip")!==popFor) closePop(); });
+window.addEventListener("resize",closePop);
+// One grid for everything: where taps land when you play, and where they snap when you draw or drag.
+// Changing it never moves taps you already recorded.
+$("gridBtn").onclick=()=>openPop($("gridBtn"),GRIDS,S.gridName,(n,v)=>{ S.grid=v; S.gridName=n; S.editGrid=v; S.editName=n; $("gridVal").textContent=n; commit(); },
+  null, true);
+const EDITS=[["Free",0],["1/2",2],["1/4",1],["1/8",0.5],["1/16",0.25],["1/32",0.125],["1/64",0.0625],...TRIP,...DOT];
+function makeTight(){
+  const g=S.editGrid; if(!g||!S.events.length) return;
+  S.events.forEach(ev=>{ ev.b=((Math.round(ev.b/g)*g)%LOOP+LOOP)%LOOP; ev.len=Math.max(g,Math.round(ev.len/g)*g); ev.loop=-1; });
+  commit();
+}
+$("rateBtn").onclick=()=>openPop($("rateBtn"),RATES,S.rateName,(n,v)=>{ S.rate=v; S.rateName=n; resyncAuto(); commit(); });
+
+/* ---------- auto ---------- */
+function resyncAuto(){
+  sendParam("grid", GRID_IDX(S.gridName)); sendParam("autoScoop", S.auto?1:0); sendParam("autoRate", RATE_IDX(S.rateName));
+  $("autoBadge").textContent=`AUTO ${S.rateName}`; $("autoBadge").hidden=!S.auto;
+  $("autoSw").setAttribute("aria-checked",S.auto); $("rateVal").textContent=S.rateName; $("gridVal").textContent=S.gridName;
+  if(typeof drawBlend==="function" && $("blender")) try{ drawBlend(); }catch(e){}
+}
+$("autoSw").onclick=()=>{ S.auto=!S.auto; resyncAuto(); commit(); };
+
+/* ---------- spoon press + keys ---------- */
+const tapBtn=$("tap");
+tapBtn.addEventListener("pointerdown",e=>{ tapBtn.setPointerCapture(e.pointerId); tapDown(); e.preventDefault(); });
+tapBtn.addEventListener("pointerup",tapUp);
+tapBtn.addEventListener("pointercancel",tapUp);
+tapBtn.addEventListener("keydown",e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); if(!e.repeat) tapDown(); } });
+tapBtn.addEventListener("keyup",e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); tapUp(); e.stopPropagation(); } });
+
+const NOTE=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const noteName=n=>NOTE[n%12]+(Math.floor(n/12)-1);
+function learnLabel(){ return S.tapKey.label+(S.midiNote===null?"":" / "+noteName(S.midiNote)); }
+function setLearning(on){ learning=on; nat("learnMidi", on); $("learnBtn").classList.toggle("learning",on); $("learnVal").textContent= on? "Hit a key or pad…" : learnLabel(); }
+$("learnBtn").onclick=()=>setLearning(!learning);
+
+window.addEventListener("keydown",e=>{
+  if(learning){
+    e.preventDefault();
+    if(e.key!=="Escape"){ const k=e.code==="Space"?"Space":(e.key.length===1?e.key.toUpperCase():e.key); S.tapKey={code:e.code,label:k}; nat("uiState","tapKeyCode",e.code); nat("uiState","tapKeyLabel",k); }
+    setLearning(false); return;
+  }
+  if(e.key==="Escape" && !pop.hidden){ closePop(); return; }
+  if((e.key==="Delete"||e.key==="Backspace") && sel.size && e.target.tagName!=="TEXTAREA" && e.target.tagName!=="INPUT"){ e.preventDefault(); removeTaps([...sel]); commit(); return; }
+  if((e.metaKey||e.ctrlKey) && (e.key==="z"||e.key==="Z"||e.key==="y")){
+    if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT") return;
+    e.preventDefault(); if(e.key==="y"||e.shiftKey) redo(); else undo(); return;
+  }
+  const tag=e.target.tagName;
+  if(tag==="INPUT"||tag==="TEXTAREA") return;
+  if(e.target===tapBtn && (e.key===" "||e.key==="Enter")) return;
+  if(e.code===S.tapKey.code){ e.preventDefault(); if(!e.repeat) tapDown(); return; }
+
+});
+window.addEventListener("keyup",e=>{
+  const tag=e.target.tagName; if(tag==="INPUT"||tag==="TEXTAREA") return;
+  if(e.code===S.tapKey.code){ e.preventDefault(); tapUp(); }
+});
+
+/* ---------- feedback copy ---------- */
+$("copyFb").onclick=async()=>{
+  const t=$("fbText").value.trim();
+  if(!t){ $("copyMsg").textContent="כתוב משהו קודם"; return; }
+  const settings=`\n\n[deep ${Math.round(S.depth*100)}% · long ${S.relSync? relNote()[0] : Math.round(S.release)+" ms"} · soft ${Math.round(S.soft*1000)} ms · grid ${S.gridName} · auto-scoop ${S.auto?S.rateName:"off"}]`;
+  try{ await navigator.clipboard.writeText(t+settings); $("copyMsg").textContent="הועתק. אפשר להדביק ולשלוח"; }
+  catch(e){ $("fbText").select(); $("copyMsg").textContent="סמן והעתק ידנית (Cmd/Ctrl+C)"; }
+};
+
+/* ---------- lane: the track's loudness with the dug-out scoops ---------- */
+const cvTl=$("tl"), BINS=768;
+const pre=new Float32Array(BINS), preSeen=new Uint8Array(BINS);
+let lastBin=-1;
+const tdBuf=new Float32Array(1024);
+function measure(){
+  if(!HOST.playing) { lastBin=-1; return; }
+  const b=HOST.ppq; if(b<0) return;
+  const pos = S.mode==="song" ? b : (((b-(HOST.poff||0))%LOOP)+LOOP)%LOOP;
+  if(pos>=LOOP) return;
+  const rms=HOST.level||0;
+  const bin=Math.floor(pos/LOOP*BINS);
+  let i=(lastBin<0||lastBin===bin||Math.abs(bin-lastBin)>BINS/4)? bin : (lastBin+1)%BINS, guard=0;
+  while(guard++<BINS){ pre[i]= preSeen[i]? pre[i]*0.6+rms*0.4 : rms; preSeen[i]=1; if(i===bin) break; i=(i+1)%BINS; }
+  lastBin=bin;
+}
+// Predict the spoon's gain across the loop from the taps (+ auto), with the same curve shape the audio uses.
+function predictGain(out){
+  out.fill(1);
+  const sp=spb(), floor=Math.max(0.0001,1-S.depth), tauR=relTau();
+  const spans=[];
+  for(const ev of S.events) spans.push([effBeat(ev), Math.max(effLen(ev)*sp, atkFor(0)*4), atkFor(0)]);
+  if(S.auto){ for(let b=0;b<LOOP-1e-9;b+=S.rate){ if(!insideTap(b)) spans.push([b, Math.max(atkFor(S.rate)*4, S.rate*sp*0.5), atkFor(S.rate)]); } }
+  const relL=relMs()/1000, binSec=LOOP/BINS*sp, tailSec=S.relSync? relL : tauR*5;
+  for(const [s,holdSec,atk] of spans){
+    const b0=Math.floor(s/LOOP*BINS), n=Math.ceil((holdSec+tailSec)/binSec);
+    const vEnd=floor+(1-floor)*Math.exp(-holdSec/atk);
+    for(let k=0;k<=n;k++){
+      const dt=k*binSec; let g;
+      if(dt<holdSec) g=floor+(1-floor)*Math.exp(-dt/atk);
+      else g= S.relSync ? vEnd+(1-vEnd)*pumpShape((dt-holdSec)/relL) : 1-(1-vEnd)*Math.exp(-(dt-holdSec)/tauR);
+      const idx=(b0+k)%BINS; if(g<out[idx]) out[idx]=g;
+    }
+  }
+}
+const gainArr=new Float32Array(BINS);
+const LV={s:0,l:16};   // visible window of the loop, in beats
+function laneGeom(){ const w=cvTl.clientWidth; return {w, pad:10, X:b=>10+(w-20)*((b-LV.s)/LV.l)}; }
+function clampView(){ LV.l=Math.min(LOOP,Math.max(0.5,LV.l)); LV.s=Math.min(LOOP-LV.l,Math.max(0,LV.s)); }
+function zoomAt(factor, beat){ const nl=Math.min(LOOP,Math.max(0.5,LV.l/factor)); const f=(beat-LV.s)/LV.l; LV.s=beat-f*nl; LV.l=nl; clampView(); }
+function drawLane(){
+  const g2=cvTl.getContext("2d");
+  const dpr=(window.devicePixelRatio||1)*(typeof VIEW!=="undefined"?VIEW.s:1), w=cvTl.clientWidth, h=cvTl.clientHeight;
+  if(!w) return;
+  if(cvTl.width!==Math.round(w*dpr)||cvTl.height!==Math.round(h*dpr)){ cvTl.width=Math.round(w*dpr); cvTl.height=Math.round(h*dpr); }
+  g2.setTransform(dpr,0,0,dpr,0,0); g2.clearRect(0,0,w,h);
+  const {X}=laneGeom(), mid=h/2+14, amp=h/2-30;
+  // grid
+  let step=S.editGrid||S.grid||0.25; const pxPer=(w-20)/LV.l;
+  while(step*pxPer<6) step*=2;
+  const b0=Math.floor(LV.s/step)*step;
+  g2.strokeStyle="rgba(17,17,17,.07)"; g2.lineWidth=1;
+  for(let b=b0;b<=LV.s+LV.l+1e-9;b+=step){ const x=Math.round(X(b))+.5; g2.beginPath(); g2.moveTo(x,16); g2.lineTo(x,h-6); g2.stroke(); }
+  const BPB=Math.max(1,(HOST.loop||16)/4), BAR0= S.mode==="song"? 0 : Math.round((HOST.poff||0)/BPB);
+  for(let b=Math.ceil(LV.s);b<=LV.s+LV.l+1e-9;b++){
+    const bar=Math.abs(b/BPB-Math.round(b/BPB))<1e-6, x=Math.round(X(b))+.5;
+    g2.strokeStyle= bar? "rgba(17,17,17,.3)" : "rgba(17,17,17,.13)"; g2.beginPath(); g2.moveTo(x,bar?6:14); g2.lineTo(x,h-6); g2.stroke();
+    if(b<LOOP && (bar || pxPer>40)){ g2.fillStyle=C.soft; g2.font="10px 'Space Mono', monospace"; g2.fillText(bar? String(Math.round(b/BPB)+1+BAR0) : `${Math.floor(b/BPB)+1+BAR0}.${Math.round(b%BPB)+1}`, x+4, 15); }
+  }
+  // the track: measured loudness where we've heard it, a calm placeholder where we haven't
+  predictGain(gainArr);
+  let mx=0; for(let i=0;i<BINS;i++) if(preSeen[i]&&pre[i]>mx) mx=pre[i];
+  const level=i=> preSeen[i]&&mx>0 ? 0.25+0.75*Math.min(1,pre[i]/mx) : 0.62+0.06*Math.sin(i*0.21)+0.04*Math.sin(i*0.73);
+  const xb=i=>X(i/BINS*LOOP);
+  const shape=(f)=>{ g2.beginPath(); for(let i=0;i<=BINS;i++){ const j=i%BINS; const y=mid-amp*f(j); i?g2.lineTo(xb(i),y):g2.moveTo(xb(i),y); } for(let i=BINS;i>=0;i--){ const j=i%BINS; g2.lineTo(xb(i),mid+amp*f(j)); } g2.closePath(); };
+  shape(level); g2.fillStyle=C.pink; g2.fill();                       // what was there
+  shape(i=>level(i)*gainArr[i]); g2.fillStyle=C.ink; g2.fill();      // what's left: the pink is what the spoon dug out
+  // taps: a highlight column on the one under the mouse, a chunky handle on top, a stretch bar on the edge
+  for(const ev of S.events){
+    const {x,bw}=tapBox(ev), active = sel.has(ev) || (hover&&hover.ev===ev) || (pen&&pen.ev===ev);
+    const wv=Math.min(bw,w-10-x);
+    if(active){ g2.fillStyle="rgba(255,79,154,.16)"; g2.fillRect(x,22,wv,h-28); g2.strokeStyle=C.pink; g2.lineWidth=1.5; g2.strokeRect(x+.5,22.5,wv-1,h-29); }
+    g2.fillStyle= active? C.ink : C.pink; g2.strokeStyle=C.ink; g2.lineWidth=2;
+    g2.beginPath(); if(g2.roundRect) g2.roundRect(x,22,wv,14,7); else g2.rect(x,22,wv,14); g2.fill(); g2.stroke();
+    if(wv>18){ g2.strokeStyle= active? C.pink : C.ink; g2.lineWidth=1.5; for(let k=-1;k<=1;k++){ const gx=x+wv/2+k*4; g2.beginPath(); g2.moveTo(gx,26); g2.lineTo(gx,32); g2.stroke(); } }
+    const showEdge = tool==="sel" && ((hover&&hover.ev===ev&&hover.mode==="len") || (drag&&drag.mode==="len"&&sel.has(ev)));
+    if(tool==="erase" && hover&&hover.ev===ev){ g2.fillStyle="rgba(224,49,63,.18)"; g2.fillRect(x,22,wv,h-28); }
+    if(showEdge){ const ex=x+wv; g2.fillStyle=C.ink; g2.fillRect(ex-2,22,4,h-28); g2.beginPath(); g2.arc(ex,h/2+10,7,0,Math.PI*2); g2.fillStyle=C.pink; g2.fill(); g2.lineWidth=2; g2.strokeStyle=C.ink; g2.stroke(); }
+  }
+  if(marquee){ const lo=Math.min(marquee.x0,marquee.x1), hi=Math.max(marquee.x0,marquee.x1); g2.fillStyle="rgba(255,79,154,.12)"; g2.fillRect(lo,4,hi-lo,h-8); g2.setLineDash([5,4]); g2.strokeStyle=C.ink; g2.lineWidth=1.5; g2.strokeRect(lo+.5,4.5,hi-lo,h-9); g2.setLineDash([]); }
+  // playhead
+  if(HOST.playing){
+    const b=HOST.ppq;
+    const xv=X(S.mode==="song"? b : (((b-(HOST.poff||0))%LOOP)+LOOP)%LOOP);
+    if(b>=0 && xv>=0 && xv<=w){ const x=xv; g2.strokeStyle=S.rec?C.rec:C.ink; g2.lineWidth=2; g2.beginPath(); g2.moveTo(x,4); g2.lineTo(x,h-4); g2.stroke(); g2.fillStyle=S.rec?C.rec:C.pink; g2.beginPath(); g2.arc(x,6,4,0,Math.PI*2); g2.fill(); }
+  }
+  if(!S.events.length && !S.auto){ g2.fillStyle=C.soft; g2.font="11px 'Space Mono', monospace"; g2.textAlign="center"; g2.fillText(S.rec? (HOST.playing? "Recording: tap the spoon" : "Press play in your DAW, then tap") : "No taps yet. Hit \u25CF, play your DAW and tap, or double-click here", w/2, h-12); g2.textAlign="start"; }
+}
+
+/* ---------- editing taps in the lane: whole-height grab zones, wide stretch edge ---------- */
+const laneBeat = x => LV.s+(x-10)/(cvTl.clientWidth-20)*LV.l;
+function tapBox(ev){ const {X,w}=laneGeom(); const x=X(effBeat(ev)); return {x, bw:Math.max(10,(w-20)*(effLen(ev)/LV.l))}; }
+let tool="sel"; const sel=new Set();
+function setTool(t){ tool=t; [["sel","toolSel"],["pen","toolPen"],["erase","toolErase"]].forEach(([k,id])=>$(id).setAttribute("aria-pressed",k===t)); if(t!=="sel") sel.clear(); hover=null; }
+$("toolSel").onclick=()=>setTool("sel"); $("toolPen").onclick=()=>setTool("pen"); $("toolErase").onclick=()=>setTool("erase");
+function nearestTap(px){
+  let best=null, bd=1e9, bc=1e9;
+  for(const ev of S.events){
+    const {x,bw}=tapBox(ev); const d= px<x? x-px : px>x+bw? px-(x+bw) : 0; const c=Math.abs(px-(x+bw/2));
+    if(d<bd-0.01 || (Math.abs(d-bd)<=0.01 && c<bc)){ best=ev; bd=d; bc=c; }
+  }
+  return best && bd<=8 ? best : null;
+}
+function hitTest(px){
+  const ev=nearestTap(px); if(!ev) return null;
+  const {x,bw}=tapBox(ev), ex=x+bw, zone=Math.min(9, Math.max(4, bw*0.3));
+  return { ev, mode: (px>=ex-zone && px<=ex+8)? "len" : "move" };
+}
+const tapAt = px => nearestTap(px);
+function removeTaps(list){ const set=new Set(list); S.events=S.events.filter(x=>!set.has(x)); list.forEach(e=>sel.delete(e)); hover=null; }
+let drag=null, hover=null, marquee=null, pen=null, erasing=null;
+const lanePos = e => { const r=cvTl.getBoundingClientRect(); return [(e.clientX-r.left)*cvTl.clientWidth/r.width, (e.clientY-r.top)*cvTl.clientHeight/r.height]; };
+const snapB = b => S.editGrid? Math.floor(b/S.editGrid)*S.editGrid : b;
+const snapL = l => S.editGrid? Math.max(S.editGrid, Math.round(l/S.editGrid)*S.editGrid) : Math.max(0.02,l);
+
+cvTl.addEventListener("pointermove",e=>{
+  const [px]=lanePos(e);
+  if(tool==="sel"){
+    if(marquee){ marquee.x1=px; const lo=Math.min(marquee.x0,px), hi=Math.max(marquee.x0,px); sel.clear(); marquee.base.forEach(ev=>sel.add(ev));
+      S.events.forEach(ev=>{ const {x,bw}=tapBox(ev); if(x+bw>=lo && x<=hi) sel.add(ev); }); return; }
+    if(!drag){ hover=hitTest(px); cvTl.style.cursor= !hover? "default" : hover.mode==="len"? "ew-resize" : "grab"; return; }
+    if(!drag.moved && Math.abs(px-drag.px0)<3) return;
+    drag.moved=true;
+    const db=laneBeat(px)-laneBeat(drag.px0), g=S.editGrid;
+    drag.items.forEach(it=>{
+      if(drag.mode==="move"){ let nb=it.b0+db; if(g) nb=Math.round(nb/g)*g; it.ev.b= S.mode==="song"? Math.max(0,nb) : ((nb%LOOP)+LOOP)%LOOP; }
+      else it.ev.len=snapL(it.len0+db);
+    });
+  } else if(tool==="pen"){
+    cvTl.style.cursor="crosshair";
+    if(pen){ pen.ev.len=snapL(laneBeat(px)-pen.ev.b); }
+  } else {
+    cvTl.style.cursor="pointer";
+    hover = tapAt(px) ? {ev:tapAt(px),mode:"erase"} : null;
+    if(erasing){ const ev=tapAt(px); if(ev){ removeTaps([ev]); erasing.n++; } }
+  }
+});
+cvTl.addEventListener("pointerleave",()=>{ if(!drag&&!marquee) hover=null; });
+cvTl.addEventListener("pointerdown",e=>{
+  const [px]=lanePos(e); cvTl.setPointerCapture(e.pointerId); cvTl.focus({preventScroll:true});
+  if(tool==="pen"){
+    let b=snapB(laneBeat(px)); if(b<0||b>=LOOP) return;
+    const ev={b, len:S.editGrid||0.25, loop:-1}; S.events.push(ev); pen={ev}; return;
+  }
+  if(tool==="erase"){ erasing={n:0}; const ev=tapAt(px); if(ev){ removeTaps([ev]); erasing.n++; } return; }
+  const hh=hitTest(px);
+  if(!hh){ marquee={x0:px,x1:px,base: e.shiftKey? [...sel] : []}; if(!e.shiftKey) sel.clear(); return; }
+  if(e.shiftKey){ sel.has(hh.ev)? sel.delete(hh.ev) : sel.add(hh.ev); }
+  else if(!sel.has(hh.ev)){ sel.clear(); sel.add(hh.ev); }
+  const group = sel.has(hh.ev)? [...sel] : [hh.ev];
+  drag={mode:hh.mode, px0:px, moved:false, items:group.map(ev=>({ev, b0:ev.b, len0:ev.len}))};
+  group.forEach(ev=>ev.loop=-1);
+  cvTl.style.cursor= hh.mode==="len"? "ew-resize" : "grabbing";
+});
+function endPointer(){
+  if(drag){ const moved=drag.moved; drag=null; if(moved) commit(); }
+  if(marquee){ marquee=null; }
+  if(pen){ pen=null; commit(); }
+  if(erasing){ const n=erasing.n; erasing=null; if(n) commit(); }
+}
+cvTl.addEventListener("pointerup",endPointer);
+cvTl.addEventListener("pointercancel",endPointer);
+cvTl.addEventListener("dblclick",e=>{
+  if(tool!=="sel") return;
+  const [px]=lanePos(e); if(hitTest(px)) return;
+  let b=snapB(laneBeat(px)); if(b<0||b>=LOOP) return;
+  const ev={b, len:S.editGrid||0.25, loop:-1}; S.events.push(ev); sel.clear(); sel.add(ev); commit();
+});
+
+/* zoom + pan */
+const hs=$("hscroll"), ht=$("hthumb");
+function zoomUI(){
+  const zoomed=LV.l<LOOP-1e-6;
+  $("zoomFit").hidden=!zoomed; $("zoomOut").disabled=!zoomed; $("zoomIn").disabled=LV.l<=0.5+1e-6;
+  const zo=document.querySelector(".zoomov"); zo.style.top=(cvTl.offsetTop+cvTl.clientHeight-zo.offsetHeight-8)+"px";
+  hs.hidden=!zoomed;
+  if(zoomed){ ht.style.left=(LV.s/LOOP*100)+"%"; ht.style.width=(LV.l/LOOP*100)+"%"; }
+}
+$("zoomIn").onclick=()=>{ zoomAt(2, LV.s+LV.l/2); zoomUI(); };
+$("zoomOut").onclick=()=>{ zoomAt(0.5, LV.s+LV.l/2); zoomUI(); };
+$("zoomFit").onclick=()=>{ LV.s=0; LV.l=LOOP; zoomUI(); };
+cvTl.addEventListener("wheel",e=>{
+  const [px]=lanePos(e);
+  if(e.ctrlKey||e.metaKey){ e.preventDefault(); zoomAt(Math.exp(-e.deltaY*0.01), laneBeat(px)); zoomUI(); return; }
+  if(LV.l<LOOP-1e-6){ const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)? e.deltaX : e.deltaY; if(!d) return; e.preventDefault(); LV.s+=d/(cvTl.clientWidth-20)*LV.l; clampView(); zoomUI(); }
+},{passive:false});
+let hdrag=null;
+ht.addEventListener("pointerdown",e=>{ ht.setPointerCapture(e.pointerId); hdrag={x0:e.clientX, s0:LV.s}; e.stopPropagation(); });
+ht.addEventListener("pointermove",e=>{ if(!hdrag) return; const r=hs.getBoundingClientRect(); LV.s=hdrag.s0+(e.clientX-hdrag.x0)/r.width*LOOP; clampView(); zoomUI(); });
+ht.addEventListener("pointerup",()=>{ hdrag=null; });
+hs.addEventListener("pointerdown",e=>{ if(e.target!==hs) return; const r=hs.getBoundingClientRect(); LV.s=(e.clientX-r.left)/r.width*LOOP-LV.l/2; clampView(); zoomUI(); });
+zoomUI();
+
+/* selection length bar */
+const selbar=$("selbar");
+selbar.querySelectorAll("button[data-len]").forEach(b=>b.onclick=()=>{ const L=parseFloat(b.dataset.len); sel.forEach(ev=>{ ev.len=L; ev.loop=-1; }); commit(); });
+$("selDel").onclick=()=>{ if(!sel.size) return; removeTaps([...sel]); commit(); };
+function updateSelbar(){
+  [...sel].forEach(ev=>{ if(!S.events.includes(ev)) sel.delete(ev); });
+  if(!sel.size || drag || marquee){ selbar.hidden=true; return; }
+  selbar.hidden=false;
+  $("selCount").textContent = sel.size===1? "1 tap" : `${sel.size} taps`;
+  const lens=new Set([...sel].map(ev=>Math.round(ev.len*1000)/1000));
+  selbar.querySelectorAll("button[data-len]").forEach(b=>b.classList.toggle("on", lens.size===1 && lens.has(parseFloat(b.dataset.len))));
+  let minX=1e9; sel.forEach(ev=>{ const {x}=tapBox(ev); if(x<minX) minX=x; });
+  const bw=selbar.offsetWidth, cw=cvTl.clientWidth;
+  selbar.style.left = Math.max(4, Math.min(cw-bw-4, minX-10)) + "px";
+  selbar.style.top = (cvTl.offsetTop + cvTl.clientHeight - selbar.offsetHeight - 8) + "px";
+}
+
+/* ---------- speed blender UI: a spring-loaded knob (centre = your Auto-scoop rate) + a whisk that spins with it ---------- */
+const blEl=$("kBlend");
+const NAMES=[[2,"1/2"],[1,"1/4"],[0.5,"1/8"],[0.25,"1/16"],[0.125,"1/32"],[0.0625,"1/64"]];
+function rateName(r){ let b=NAMES[0]; for(const n of NAMES) if(Math.abs(Math.log2(n[0]/r))<Math.abs(Math.log2(b[0]/r))) b=n; return Math.abs(Math.log2(b[0]/r))<0.08? b[1] : "≈"+b[1]; }
+// A spring-loaded knob: a pink coil stretches along the ring as you turn it, and snaps back with a little wobble.
+(function buildBlendKnob(){
+  const A0=-0.75*Math.PI, SPAN=1.5*Math.PI; let ticks="";
+  for(let i=0;i<=10;i++){ const a=A0+SPAN*i/10; const p1=[46+42*Math.sin(a),46-42*Math.cos(a)], p2=[46+45*Math.sin(a),46-45*Math.cos(a)]; ticks+=`<line x1="${p1[0].toFixed(1)}" y1="${p1[1].toFixed(1)}" x2="${p2[0].toFixed(1)}" y2="${p2[1].toFixed(1)}" stroke="rgba(17,17,17,${i===5?.7:.35})" stroke-width="${i===5?2.5:1.5}"/>`; }
+  blEl.innerHTML=`<svg viewBox="0 0 92 92" width="92" height="92" style="overflow:visible">${ticks}
+    <path d="${arc(46,46,36,A0,A0+SPAN)}" fill="none" stroke="rgba(17,17,17,.12)" stroke-width="5" stroke-linecap="round"/>
+    <path class="coil" fill="none" stroke="${C.pink}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="47" cy="48" r="27" fill="rgba(0,0,0,.18)"/>
+    <circle cx="46" cy="46" r="26" fill="#fff" stroke="${C.ink}" stroke-width="2.5"/>
+    <line class="ptr" x1="46" y1="42" x2="46" y2="24" stroke="${C.ink}" stroke-width="4" stroke-linecap="round"/></svg>`;
+})();
+function drawBlend(vis){
+  const p = vis===undefined ? blend.pos : vis, a=p*0.75*Math.PI, coil=blEl.querySelector(".coil");
+  if(Math.abs(p)<0.005) coil.setAttribute("d","");
+  else { const N=8, steps=N*8; let d="";
+    for(let i=0;i<=steps;i++){ const t=i/steps, ang=a*t, r=36+4.5*Math.sin(t*N*2*Math.PI); d+=(i?"L":"M")+(46+r*Math.sin(ang)).toFixed(1)+" "+(46-r*Math.cos(ang)).toFixed(1); }
+    coil.setAttribute("d",d); }
+  blEl.querySelector(".ptr").setAttribute("transform",`rotate(${a*180/Math.PI} 46 46)`);
+  $("blendRead").textContent = Math.abs(blend.pos)<0.001? S.rateName : rateName(effRate());
+  $("blendcol").classList.toggle("off",!S.auto);
+}
+function blendKick(){
+  sendParam("speedBlender", blend.pos); return;
+  if(!ctx||!S.playing||!S.auto) return;
+  const nowB=beatAt(ctx.currentTime), want=Math.max(nowB, lastAutoBeat+effRate());
+  if(want<nextAuto) nextAuto=want;
+  tick();
+}
+let blendY0=0, blendP0=0;
+blEl.addEventListener("pointerdown",e=>{ blEl.setPointerCapture(e.pointerId); cancelAnimationFrame(blend.raf); nat("gesture","speedBlender",true); blend.drag=true; blendY0=e.clientY; blendP0=blend.pos; });
+blEl.addEventListener("pointermove",e=>{ if(!blend.drag) return; blend.pos=Math.max(-1,Math.min(1,blendP0+(blendY0-e.clientY)/110)); drawBlend(); blendKick(); });
+function blendRelease(){
+  if(!blend.drag) return; blend.drag=false;
+  const start=blend.pos, t0b=performance.now();
+  const step=t=>{ const k=Math.min(1,(t-t0b)/180), kv=Math.min(1,(t-t0b)/300);
+    blend.pos= k<1 ? start*(1-k)*(1-k) : 0; drawBlend(start*Math.cos(kv*Math.PI*1.5)*(1-kv));
+    if(k<1) blendKick(); else if(!blend.settled){ blend.settled=true; resyncAuto(); }
+    if(kv<1) blend.raf=requestAnimationFrame(step); else { blend.pos=0; drawBlend(0); sendParam("speedBlender",0); nat("gesture","speedBlender",false); } };
+  blend.settled=false;
+  blend.raf=requestAnimationFrame(step);
+}
+blEl.addEventListener("pointerup",blendRelease);
+blEl.addEventListener("pointercancel",blendRelease);
+// the whisk spins faster the further you push, and settles when you let go
+const whisk=$("whiskWires"); let whiskPhase=0, whiskSpeed=0, whiskT=performance.now();
+function spinWhisk(now){
+  const dt=Math.min(0.05,(now-whiskT)/1000); whiskT=now;
+  const target= Math.abs(blend.pos)>0.01 ? 1.5+14*Math.abs(blend.pos) : 0;
+  whiskSpeed += (target-whiskSpeed)*Math.min(1,dt*10);
+  whiskPhase += dt*whiskSpeed*Math.PI*2;
+  const sx = whiskSpeed>0.05 ? 0.3+0.7*Math.abs(Math.cos(whiskPhase)) : 1;
+  whisk.setAttribute("transform", sx<0.999? `translate(${18*(1-sx)} 0) scale(${sx.toFixed(3)} 1)` : "");
+}
+
+/* ---------- spoon meter + loop ---------- */
+const fill=$("fill"), fillClip=$("fillClipRect");
+const BOWL_TOP=170, BOWL_BOTTOM=296;
+function updateMeter(){
+  const gain=HOST.gain, red=Math.min(1,Math.max(0,1-gain));
+  const hgt=(BOWL_BOTTOM-BOWL_TOP)*red;
+  if(fill){ fill.setAttribute("y",BOWL_BOTTOM-hgt); fill.setAttribute("height",hgt); }
+  fillClip.setAttribute("y",BOWL_BOTTOM-hgt); fillClip.setAttribute("height",hgt);
+  $("press").setAttribute("transform",`translate(${(-6*red).toFixed(2)} ${(34*red).toFixed(2)})`);
+  updatePudding(red, performance.now());
+  $("gr").textContent= gain<0.0002? "−∞ dB" : `${(20*Math.log10(Math.max(gain,1e-4))).toFixed(1)} dB`;
+}
+/* ---------- Jelly mode: every dip nudges the colour along and the dancer strikes a new pose ---------- */
+const JC={hue:333, e:0, col:"#ff4f9a", pose:0, last:""};
+function jellyKick(){
+  JC.e=Math.min(1.6, JC.e+0.3);
+  let p; do{ p=Math.floor(Math.random()*8); }while(p===JC.pose); JC.pose=p;
+  const pos=(p*100/7).toFixed(4)+"% 0";
+  $("dzBase").style.backgroundPosition=pos; $("dzTint").style.webkitMaskPosition=pos; $("dzTint").style.maskPosition=pos;
+}
+function jellyStep(dt, now){
+  if(isOpen()){                       // back to the plugin's own pink when the controls are open
+    JC.e=0; let d=((333-JC.hue+540)%360)-180; if(Math.abs(d)<0.3) d=0; JC.hue+=d*Math.min(1,dt*3);
+  } else {
+    const t=now/1000;
+    JC.hue=(JC.hue + dt*JC.e*(18+11*Math.sin(t*0.73)+6*Math.sin(t*1.9)) + 360)%360;
+    JC.e*=Math.exp(-dt*0.55);
+  }
+  const h=JC.hue.toFixed(1); if(h===JC.last) return; JC.last=h;
+  const near=Math.abs(((JC.hue-333+540)%360)-180)<0.6;
+  JC.col= near? "#ff4f9a" : `hsl(${h},96%,61%)`;
+  $("plugin").style.setProperty("--jelly", JC.col);
+  $("jst0").setAttribute("stop-color", near? "#ff6aae" : `hsl(${h},100%,71%)`);
+  $("jst1").setAttribute("stop-color", near? "#ff3f92" : `hsl(${h},100%,62%)`);
+  $("jst2").setAttribute("stop-color", near? "#d9206f" : `hsl(${h},74%,49%)`);
+}
+/* ---------- pudding: one continuous surface driven by the same gain as the audio, so any speed reads right ---------- */
+const pudSurf=$("pudSurf"), pudBody=$("pudBody"), pudShine=$("pudShine"), dropsG=$("drops");
+const PBASE=318, PCX=130, PSIG=40;
+let pPrev=0, jig=0, lastSplash=0, tPrev=performance.now(), parts=[];
+function splash(red){
+  const n = S.soft<0.006? 7 : S.soft<0.02? 4 : S.soft<0.04? 2 : 0;   // a soft spoon slides in, a sharp one splashes
+  for(let i=0;i<n;i++) parts.push({x:PCX+(Math.random()-.5)*70, y:PBASE-6, vx:(Math.random()-.5)*220, vy:-(160+Math.random()*180)*(.5+red), r:2.5+Math.random()*3.5});
+}
+function updatePudding(red, now){
+  const dt=Math.min(0.05,(now-tPrev)/1000)||0.016; tPrev=now;
+  const vel=(red-pPrev)/dt;
+  jig=Math.max(jig*Math.exp(-dt*5), Math.min(1, Math.abs(vel)/18));
+  if(red-pPrev>0.015 && red>0.2 && now-lastSplash>150){ lastSplash=now; splash(red); if(!isOpen()) jellyKick(); }
+  pPrev=red;
+  const t=now/1000, ys=[];
+  for(let x=0;x<=340;x+=6){
+    const g=Math.exp(-((x-PCX)**2)/(2*PSIG*PSIG));
+    const rim=Math.exp(-((Math.abs(x-PCX)-PSIG*1.7)**2)/(2*(PSIG*.45)**2));
+    const wob=jig*(3.2*Math.sin(t*38+x*0.11)+1.6*Math.sin(t*23-x*0.07));
+    ys.push([x, PBASE + 40*red*g - 7*red*rim + wob]);
+  }
+  const surf=ys.map(([x,y],i)=>(i?"L":"M")+x+" "+y.toFixed(1)).join(" ");
+  pudSurf.setAttribute("d",surf);
+  pudBody.setAttribute("d",surf+" L340 440 L0 440 Z");
+  pudShine.setAttribute("d",ys.filter(([x])=>x>190&&x<300).map(([x,y],i)=>(i?"L":"M")+x+" "+(y+9).toFixed(1)).join(" "));
+  parts.forEach(p=>{ p.vy+=950*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; });
+  parts=parts.filter(p=>!(p.vy>0 && p.y>PBASE+6));
+  dropsG.innerHTML=parts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.r.toFixed(1)}" fill="${JC.col}" stroke="#111" stroke-width="2"/>`).join("");
+}
+
+function updateLoop(){
+  let L;
+  if(S.mode==="song"){ let end=HOST.ppq||0; for(const e of S.events) end=Math.max(end, e.b+e.len); L=Math.max(32, Math.ceil((end+16)/16)*16); }
+  else L=HOST.loop||16;
+  if(Math.abs(L-LOOP)>1e-6){ const grew=L>LOOP; LOOP=L; if(S.mode!=="song"||!grew){ pre.fill(0); preSeen.fill(0); } clampView(); zoomUI(); }
+  // Song: the view follows the playhead
+  if(S.mode==="song" && HOST.playing && !drag && !pen && !marquee && !hdrag){
+    const b=HOST.ppq; if(b>LV.s+LV.l*0.92 || b<LV.s){ LV.s=Math.max(0,b-LV.l*0.08); clampView(); zoomUI(); }
+  }
+}
+let frameT=performance.now();
+function frame(){ const fnow=performance.now(), fdt=Math.min(0.05,(fnow-frameT)/1000); frameT=fnow; jellyStep(fdt,fnow); updateMeter(); if(isOpen()){ spinWhisk(performance.now()); measure(); updateLoop(); drawLane(); updateSelbar(); const zo=document.querySelector(".zoomov"); zo.style.top=(cvTl.offsetTop+cvTl.clientHeight-zo.offsetHeight-8)+"px"; } requestAnimationFrame(frame); }
+/* ---------- Pattern / Song ---------- */
+function setMode(m, quiet){
+  if(m!==S.mode){ TAPS[S.mode]=S.events; S.mode=m; S.events=TAPS[m]; }
+  $("modeSw").querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.m===m));
+  sel.clear(); hover=null; pre.fill(0); preSeen.fill(0);
+  updateLoop(); LV.s=0; LV.l=Math.min(LOOP,16); clampView(); zoomUI();
+  undoStack.length=0; redoStack.length=0; histCur=null; commit(); histUI();
+  if(!quiet) sendParam("mode", m==="song"?1:0);
+}
+$("modeSw").querySelectorAll("button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+const fromFlat=a=>{ const out=[]; for(let i=0;i+1<(a||[]).length;i+=2) out.push({b:a[i], len:a[i+1], loop:-1}); return out; };
+
+/* ---------- home screen: where the big spoon sits when Control stuff is closed ---------- */
+function placeHome(){
+  const plug=$("plugin"), col=document.querySelector(".spooncol");
+  const was=plug.classList.contains("open"); plug.classList.add("open");   // measure in the open layout
+  const pr=plug.getBoundingClientRect(), cr=col.getBoundingClientRect(), k=VIEW.s||1;
+  const head=document.querySelector("header.top");
+  const top=head? head.getBoundingClientRect().bottom : pr.top;
+  const dx=((pr.left+pr.width/2)-(cr.left+cr.width/2))/k;
+  const dy=(((top+pr.bottom)/2)-(cr.top+cr.height/2))/k - 30;
+  plug.style.setProperty("--home-dx", dx.toFixed(1)+"px"); plug.style.setProperty("--home-dy", dy.toFixed(1)+"px");
+  if(!was){ plug.classList.remove("open"); }
+}
+
+/* ---------- window size: the plugin window is exactly the size of the screen ---------- */
+const VIEW={s:1};
+// The window can be made bigger/smaller from its corner: the plugin tells us the zoom.
+function setScale(sc){ VIEW.s=sc||1; document.querySelector(".wrap").style.transform = Math.abs(VIEW.s-1)>0.001 ? `scale(${VIEW.s})` : ""; closePop(); }
+function reportSize(){ const p=$("plugin"); nat("resize", Math.ceil(p.offsetWidth), Math.ceil(p.offsetHeight)); }
+new ResizeObserver(reportSize).observe($("plugin"));
+
+/* ---------- from the plugin: settings (also DAW automation), the live volume, the tempo ---------- */
+function applyHost(p){
+  fromHost=true;
+  try{
+    kRel.setValue(p.howLong); kDep.setValue(p.howDeep); kSoft.setValue(p.howSoft);
+    S.relSync = p.longUnit>=0.5; showRel();
+    const g=GRIDS[p.grid|0]||GRIDS[3]; S.grid=g[1]; S.gridName=g[0]; S.editGrid=g[1]; S.editName=g[0];
+    const r=RATES[p.autoRate|0]||RATES[1]; S.rate=r[1]; S.rateName=r[0];
+    S.auto = p.autoScoop>=0.5;
+    if(!blend.drag && !blend.raf) { blend.pos=p.speedBlender||0; }
+    resyncAuto();
+    if(p.tapKeyCode){ S.tapKey={code:p.tapKeyCode,label:p.tapKeyLabel||p.tapKeyCode}; }
+    if(typeof p.midiNote==="number") S.midiNote = p.midiNote>=0 ? p.midiNote : null;
+    if(p.mode!==undefined){ const m=p.mode>=0.5?"song":"pattern"; if(m!==S.mode) setMode(m,true); }
+    if(!learning) $("learnVal").textContent=learnLabel();
+  } finally { fromHost=false; }
+}
+if(JB){
+  JB.addEventListener("params", p=>{ applyHost(p); histCur=null; commit(); });
+  JB.addEventListener("tick", t=>{ HOST.gain=t.g; HOST.bpm=t.bpm; S.bpm=t.bpm; HOST.playing=!!t.playing; HOST.ppq=t.ppq||0; HOST.level=t.level||0; HOST.loop=t.loop||16; HOST.poff=t.poff||0;
+    if(!!t.rec!==S.rec){ S.rec=!!t.rec; syncUI(); } });
+  // Recording added or finished a tap (or a saved session was opened): show the plugin's taps.
+  JB.addEventListener("taps", t=>{
+    tapsSynced=true;
+    TAPS.pattern=fromFlat(t.pattern); TAPS.song=fromFlat(t.song);
+    if(!drag && !pen && !marquee){ S.events=TAPS[S.mode]; sel.clear(); hover=null; }
+    fromHost=true; try{ commit(); } finally { fromHost=false; }
+  });
+  JB.addEventListener("midiLearned", m=>{ S.midiNote=m.note; setLearning(false); });
+  JB.addEventListener("scale", e=>setScale(e.s));
+}
+if(INIT.version) $("ver").textContent="v"+INIT.version;
+if(INIT.scale) setScale(Number(INIT.scale));
+// Ready to tap right away when the window opens.
+window.focus(); try{ $("tap").focus({preventScroll:true}); }catch(e){}
+$("drawer").hidden=false;
+document.querySelector(".spooncol").style.transition="none"; $("drawer").style.transition="none";
+placeHome();
+setDrawer(INIT.drawerOpen!=="0");
+requestAnimationFrame(()=>requestAnimationFrame(()=>{ document.querySelector(".spooncol").style.transition=""; $("drawer").style.transition=""; }));
+resyncAuto(); commit(); histUI();
+nat("ready");
+requestAnimationFrame(reportSize);
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
