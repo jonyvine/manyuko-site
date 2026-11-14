@@ -60,8 +60,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,.knob:focus-visi
 .logo{color:var(--ink);line-height:.9;margin:0}
 .logo small{display:block;font-family:"Rubik",var(--logo);font-weight:900;font-size:17px;letter-spacing:.01em;color:var(--jelly);margin-bottom:-2px}
 .logo span{display:block;font-family:"Rubik",var(--logo);font-weight:900;font-size:56px;letter-spacing:-.015em;line-height:.86}
-.brand{display:flex;flex-direction:column;gap:6px}
-.tagline{margin:0;font-family:var(--mono);font-weight:400;font-size:12.5px;letter-spacing:.19em;text-transform:uppercase;color:#6d6963}
+.brand{display:flex;flex-direction:column;gap:6px;position:relative;z-index:2}
+.tagline{margin:0;font-family:var(--mono);font-weight:400;font-size:12.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--ink)}
 
 
 
@@ -85,7 +85,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,.knob:focus-visi
 .drawer{transition:opacity .4s ease .08s, transform .5s cubic-bezier(.45,0,.2,1), visibility 0s linear 0s}
 .plugin:not(.open) .drawer{opacity:0;transform:translateX(60px);pointer-events:none;visibility:hidden;transition:opacity .25s ease, transform .4s cubic-bezier(.45,0,.2,1), visibility 0s linear .4s}
 
-.spooncol{display:flex;flex-direction:column;align-items:center;gap:8px}
+.spooncol{display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:1}
 .spoonwrap{position:relative;width:340px;height:440px}
 .spoonwrap svg{position:absolute;inset:0;overflow:visible}
 .dancer{position:absolute;left:318px;top:250px;width:184px;height:184px;pointer-events:none;isolation:isolate;transition:opacity .35s ease .3s,visibility 0s linear 0s}
@@ -1301,5 +1301,6 @@ requestAnimationFrame(reportSize);
 requestAnimationFrame(frame);
 })();
 </script>
+<script src="party.js"></script>
 </body>
 </html>
