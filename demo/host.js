@@ -65,7 +65,15 @@ function transportMsg() { post({ type: "transport", tr: { playing: T.playing, at
 let audioPromise = null;
 function ensureAudio() {
   if (audioPromise) { if (ctx && ctx.state === "suspended") ctx.resume(); return audioPromise; }
+  if (!window.isSecureContext || !(window.AudioContext || window.webkitAudioContext)) {
+    // browsers only run this sound engine on secure (https://) pages
+    setStatus("Sound needs a secure page. Open https://manyuko.com (with the s).");
+    audioPromise = Promise.reject(new Error("insecure"));
+    audioPromise.catch(() => {});
+    return audioPromise;
+  }
   ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!ctx.audioWorklet) { setStatus("This browser can't run the demo. Try Chrome or Safari."); audioPromise = Promise.reject(new Error("noworklet")); audioPromise.catch(() => {}); return audioPromise; }
   master = ctx.createGain(); master.gain.value = 0.85; master.connect(ctx.destination);
   kickBus = ctx.createGain(); kickBus.gain.value = 0.5; kickBus.connect(master);   // the kick is not spooned
   padBus = ctx.createGain(); padBus.gain.value = 0.9;
@@ -109,7 +117,7 @@ function schedule() {
   }
 }
 async function play() {
-  await ensureAudio();
+  try { await ensureAudio(); } catch (e) { return; }
   if (T.playing) return;
   T.playing = true; T.everPlayed = true;
   T.at = ctx.currentTime + 0.08; T.ap = 0; T.nextBeat = 0;
