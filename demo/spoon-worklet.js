@@ -20,7 +20,7 @@ function blendedRate(base, b) {
 function lockStart(beat, grid, bpm) {
   if (grid <= 0) return beat;
   const prev = Math.floor(beat / grid) * grid;
-  return (beat - prev) * 60 / bpm > 0.045 ? prev + grid : prev;
+  return (beat - prev) < grid * 0.5 ? prev : prev + grid;   // nearest grid line
 }
 const lockLength = (held, grid) => (grid > 0 ? Math.max(grid, Math.round(held / grid) * grid) : Math.max(0.02, held));
 

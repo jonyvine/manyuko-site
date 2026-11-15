@@ -41,7 +41,7 @@ const NATIVE = {
   },
 };
 window.__JUCE__ = {
-  initialisationData: { version: "0.4.4 · web", drawerOpen: MOBILE ? "0" : UI.drawerOpen, scale: 1 },
+  initialisationData: { version: "0.4.5 · web", drawerOpen: MOBILE ? "0" : UI.drawerOpen, scale: 1 },
   backend: {
     addEventListener(name, f) { (handlers[name] = handlers[name] || []).push(f); return [name, f]; },
     removeEventListener() {},

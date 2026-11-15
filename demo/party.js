@@ -135,7 +135,7 @@ function frame(now) {
   handsPos += (((!open && s >= 3) ? 1 : 0) - handsPos) * Math.min(1, dt * (folding ? 4 : 1.5));
   if (handsPos > 0.01 && IMG.hands.complete) {
     const fw = IMG.hands.naturalWidth, fh = IMG.hands.naturalHeight / 2, w = 730, h = w * fh / fw;
-    const y = H - h * (handsPos * handsPos * (3 - 2 * handsPos)) + (crowdFrame ? 0 : 10);
+    const y = H - h * (handsPos * handsPos * (3 - 2 * handsPos)) - (crowdFrame ? 8 : 0);   // bounce upward, never below the window
     cx.save(); cx.beginPath(); cx.roundRect(0, 0, W, H, 22); cx.clip();
     cx.drawImage(IMG.hands, 0, crowdFrame * fh, fw, fh, (W - w) / 2, y, w, h);
     cx.restore();
