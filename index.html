@@ -75,6 +75,14 @@ h2{font-family:var(--display);font-weight:900;font-size:clamp(30px,4vw,44px);lin
 .specs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:3px solid var(--ink);border-radius:16px;overflow:hidden;margin:0}
 .specs div{padding:18px;border-right:3px solid var(--ink)}
 .specs div:last-child{border-right:0}
+.faq{border:3px solid var(--ink);border-radius:16px;overflow:hidden;margin:0}
+.faq details{border-top:3px solid var(--ink)}
+.faq details:first-child{border-top:0}
+.faq summary{list-style:none;cursor:pointer;padding:16px 52px 16px 18px;font-weight:700;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:18px;top:50%;transform:translateY(-50%);font-family:var(--display);font-size:22px;line-height:1;color:var(--jelly-deep)}
+.faq details[open] summary::after{content:"\2013"}
+.faq details p{margin:0;padding:0 18px 18px;color:var(--soft);max-width:68ch}
 .specs dt{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0 0 6px}
 .specs dd{margin:0;font-weight:700}
 .pill{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:2px solid var(--ink);border-radius:999px;padding:1px 8px;margin-left:6px;background:var(--paper-2)}
@@ -217,6 +225,19 @@ footer{font-family:var(--mono);color:var(--ink);opacity:.7;border-top-width:2px}
         <div><dt>Pro Tools</dt><dd>AAX <span class="pill">in progress</span></dd></div>
         <div><dt>Runs on</dt><dd>Apple Silicon and Intel</dd></div>
       </dl>
+    </section>
+
+    <section id="faq" aria-labelledby="faq-h">
+      <h2 id="faq-h">FAQ</h2>
+      <div class="faq">
+        <details><summary>Does it record my audio?</summary><p>No. THE SPOON works live on whatever comes into it and only remembers your taps. Change anything before it and you hear the change right away.</p></details>
+        <details><summary>Where should I put it in my chain?</summary><p>Usually last. Everything before it dips; anything after it (a reverb, a delay, a distortion) won't follow the dip the same way.</p></details>
+        <details><summary>How do I keep what I played?</summary><p>Hit Rec and tap. Your taps are saved inside the plugin with your project, lock to your DAW's grid and stay editable.</p></details>
+        <details><summary>Can I use DAW automation instead?</summary><p>Yes. Draw the "Spoon" parameter in your automation lane, like any plugin.</p></details>
+        <details><summary>Does it add latency or color the sound?</summary><p>No. Zero added latency, and it only changes volume. When it's not dipping, your sound passes through untouched.</p></details>
+        <details><summary>Which DAWs and systems?</summary><p>Any Mac DAW that runs VST3 or Audio Unit: Ableton Live, Logic Pro, Cubase, Reaper, Bitwig and more. Apple Silicon and Intel. AAX for Pro Tools is in progress. No Windows version yet.</p></details>
+        <details><summary>Can I try it first?</summary><p>Yes, right here: the demo above runs the same engine as the plugin.</p></details>
+      </div>
     </section>
 
     <section id="about" aria-labelledby="about-h">
