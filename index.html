@@ -150,6 +150,16 @@ footer{font-family:var(--mono);color:var(--ink);opacity:.7;border-top-width:2px}
 .hero{grid-template-columns:minmax(0,5.4fr) minmax(0,6.6fr)}
 .btn{padding:11px 17px;letter-spacing:.07em}
 @media (max-width:860px){.hero{grid-template-columns:1fr;padding:56px 0}}
+.notify{border:2px solid var(--ink);border-radius:24px;background:var(--jelly);padding:44px 40px;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:36px;align-items:center;box-shadow:8px 10px 0 var(--ink)}
+.notify h2{margin:0 0 12px}
+.notify p{margin:0;font-size:19px;max-width:40ch}
+.notify .btn{background:var(--paper);font-size:14px;padding:14px 22px}
+.notify small{display:block;font-family:var(--mono);font-size:12.5px;margin-top:12px;opacity:.8}
+.notify .kicker,.notify .btn,.notify small{font-family:var(--display)}
+.notify .kicker{letter-spacing:.12em;font-weight:600}
+.notify .btn{letter-spacing:.04em;font-weight:700}
+.notify small{font-size:14px}
+@media (max-width:860px){.notify{grid-template-columns:1fr;padding:32px 24px;gap:22px}}
 </style>
 </head>
 <body>
@@ -194,6 +204,21 @@ footer{font-family:var(--mono);color:var(--ink);opacity:.7;border-top-width:2px}
       </div>
       <div class="demo-frame"><iframe id="demoFrame" src="about:blank" title="THE SPOON browser demo" allow="autoplay; midi" loading="lazy"></iframe></div>
       <p class="demo-note"><span class="only-desk">Headphones help. The demo pad is an original track; you can also load your own loop.</span><span class="only-phone">Headphones help. Silent mode on? Turn it off to hear it.</span></p>
+    </section>
+
+
+    <section id="notify" aria-labelledby="notify-h">
+      <div class="notify">
+        <div>
+          <p class="kicker" style="opacity:.75">Coming soon</p>
+          <h2 id="notify-h">Get it first, for less</h2>
+          <p>Join the list and you'll hear the moment THE SPOON is out, with the launch price before anyone else.</p>
+        </div>
+        <div>
+          <a class="btn" href="https://manyuko.moonbase.sh/subscribe" target="_blank" rel="noopener">Get the launch price first &rarr;</a>
+          <small>One email at launch. A few updates on the way. No spam, unsubscribe anytime.</small>
+        </div>
+      </div>
     </section>
 
     <section aria-labelledby="how-h">
