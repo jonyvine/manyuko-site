@@ -33,6 +33,10 @@ img{max-width:100%;height:auto;display:block}
 header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 0;border-bottom:3px solid var(--ink)}
 .mark{font-family:var(--display);font-weight:900;font-size:26px;letter-spacing:.08em;text-decoration:none}
 .mark span{color:var(--jelly)}
+.mark{display:inline-flex;align-items:center;line-height:0}
+.mark img{height:72px;width:auto;transform-origin:12% 90%;transition:transform .25s ease}
+.mark:hover img{transform:rotate(-2deg) scale(1.03)}
+@media (max-width:700px){.mark img{height:56px}}
 nav{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 nav a{text-decoration:none}
 nav a:hover{color:var(--jelly-deep)}
@@ -170,7 +174,7 @@ footer{font-family:var(--mono);color:var(--ink);opacity:.7;border-top-width:2px}
 <body>
 <div class="page">
   <header class="top">
-    <a class="mark" href="#">MANYUKO<span>.</span></a>
+    <a class="mark" href="#" aria-label="MANYUKO home"><img src="img/manyuko-wordmark.png" width="757" height="200" alt="MANYUKO"></a>
     <nav aria-label="Sections"><a href="#spoon">The Spoon</a><a href="#demo">Try it</a><a href="#about">About</a><a href="#contact">Contact</a></nav>
   </header>
 
